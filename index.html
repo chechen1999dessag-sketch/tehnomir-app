@@ -983,7 +983,7 @@
   <div class="header no-print">
     <div>
       <h1>Рассрочка ТехноМир</h1>
-      <p>Клиенты, оплаты, договор, печать и облачное хранение · v27</p><p id="cloudStatus" style="margin-top:4px;color:#aaa;font-size:13px;">Подключение к облаку...</p>
+      <p>Клиенты, оплаты, договор, печать и облачное хранение · v28</p><p id="cloudStatus" style="margin-top:4px;color:#aaa;font-size:13px;">Подключение к облаку...</p>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
       <button class="btn2 theme-toggle" id="themeToggleBtn" onclick="toggleTheme()"><span class="btn-icon">🌙</span><span>Тёмный режим</span></button>
@@ -1043,6 +1043,7 @@
       <div class="card no-print">
         <h2 class="section-title">Добавить рассрочку</h2>
         <div class="formgrid">
+          <input type="hidden" id="clientId">
           <input id="fullName" placeholder="ФИО клиента">
           <input id="phone" placeholder="Телефон" inputmode="tel" onbeforeinput="rememberMaskState(this, event)" oninput="handlePhoneInput(this)" title="Введи цифры, например 89380866451 — формат поставится автоматически">
           <input id="address" placeholder="Адрес">
@@ -1685,8 +1686,15 @@ function normalizePassport(value) {
   return digitsOnly(value || "");
 }
 
+function generateClientId() {
+  return "client_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+}
+
 function isSameClient(a, b) {
   if (!a || !b) return false;
+
+  // Новая надёжная логика: если есть clientId — сравниваем именно его.
+  if (a.clientId && b.clientId) return String(a.clientId) === String(b.clientId);
 
   const aPhone = normalizeClientPhone(a.phone);
   const bPhone = normalizeClientPhone(b.phone);
@@ -1697,21 +1705,93 @@ function isSameClient(a, b) {
   const aName = normalizeClientName(a.fullName);
   const bName = normalizeClientName(b.fullName);
 
-  // Самые надёжные совпадения: телефон и паспорт.
+  // Это fallback только для старых договоров без clientId.
   if (aPhone && bPhone && aPhone === bPhone) return true;
   if (aPassport && bPassport && aPassport === bPassport) return true;
-
-  // Если телефон/паспорт в старом договоре отличался или был введён иначе,
-  // группируем по одинаковому ФИО.
   if (aName && bName && aName === bName) return true;
 
   return false;
 }
 
+function findExistingClientId(item) {
+  const found = installments.find(x => x.clientId && isSameClient(x, item));
+  return found?.clientId || "";
+}
+
+function ensureClientId(item) {
+  if (!item) return "";
+  if (item.clientId) return item.clientId;
+
+  const existingId = findExistingClientId(item);
+  item.clientId = existingId || generateClientId();
+  item.updated_at = nowIso();
+  return item.clientId;
+}
+
+function migrateClientIds() {
+  let changed = false;
+
+  installments.forEach(item => {
+    if (item.clientId) return;
+
+    const existing = installments.find(other =>
+      other !== item &&
+      other.clientId &&
+      isSameClient(other, item)
+    );
+
+    if (existing?.clientId) {
+      item.clientId = existing.clientId;
+    } else {
+      const similarWithoutId = installments.find(other =>
+        other !== item &&
+        !other.clientId &&
+        isSameClient(other, item)
+      );
+
+      if (similarWithoutId?.clientId) {
+        item.clientId = similarWithoutId.clientId;
+      } else {
+        item.clientId = generateClientId();
+      }
+    }
+
+    item.updated_at = nowIso();
+    changed = true;
+  });
+
+  // Второй проход: объединяем старые совпадающие записи под один clientId.
+  installments.forEach(item => {
+    installments.forEach(other => {
+      if (item === other) return;
+      if (isSameClient(item, other) && item.clientId && other.clientId && item.clientId !== other.clientId) {
+        const keeper = String(item.clientId) < String(other.clientId) ? item.clientId : other.clientId;
+        item.clientId = keeper;
+        other.clientId = keeper;
+        item.updated_at = nowIso();
+        other.updated_at = nowIso();
+        changed = true;
+      }
+    });
+  });
+
+  if (changed) {
+    installments.forEach(item => queueChange("upsert", item));
+    persistLocal();
+  }
+
+  return changed;
+}
+
 function clientContracts(item) {
   if (!item) return [];
+  const clientId = ensureClientId(item);
+
   return installments
-    .filter(x => isSameClient(x, item))
+    .filter(x => {
+      if (x.clientId && clientId) return String(x.clientId) === String(clientId);
+      return isSameClient(x, item);
+    })
     .sort((a, b) => Number(b.id) - Number(a.id));
 }
 
@@ -1723,7 +1803,10 @@ function fillNewInstallmentForClient(id) {
   const item = installments.find(x => String(x.id) === String(id));
   if (!item) return;
 
+  ensureClientId(item);
+
   const map = {
+    clientId: item.clientId || "",
     fullName: item.fullName || "",
     phone: formatPhoneNumber(item.phone || ""),
     address: item.address || "",
@@ -1754,7 +1837,7 @@ function fillNewInstallmentForClient(id) {
 }
 
 function addInstallment(){
-  const fields = ["fullName","phone","address","passportNumber","passportIssued","passportDate","product","model","totalPrice","downPayment","months","firstPaymentDate"];
+  const fields = ["clientId","fullName","phone","address","passportNumber","passportIssued","passportDate","product","model","totalPrice","downPayment","months","firstPaymentDate"];
   const item = { id: Date.now(), payments: [], createdAt: today(), updated_at: nowIso() };
   for (const f of fields) {
     const el = document.getElementById(f);
@@ -1799,6 +1882,12 @@ function addInstallment(){
     showToast("Первый взнос не может быть больше стоимости", "error");
     return;
   }
+
+  if (!item.clientId) {
+    const existingId = findExistingClientId(item);
+    item.clientId = existingId || generateClientId();
+  }
+
   installments.unshift(item);
   selectedId = item.id;
   queueChange("upsert", item);
@@ -1807,6 +1896,8 @@ function addInstallment(){
     const el = document.getElementById(f);
     if (el && f !== "months") el.value = ""; 
   });
+  const clientIdField = document.getElementById("clientId");
+  if (clientIdField) clientIdField.value = "";
   document.getElementById("months").value = "6";
   updateMaskWarnings();
   prefillDefaultPaymentDate();
@@ -1896,6 +1987,7 @@ function deleteItem(){
   showToast("Рассрочка удалена", "info");
 }
 function render(){
+  migrateClientIds();
   if (!["all","active","overdue","dueToday","closed"].includes(listFilter)) listFilter = "all";
   if (installments.length && !installments.some(x => String(x.id) === String(selectedId))) selectedId = installments[0].id;
   const cloudEl = document.getElementById("cloudStatus");
@@ -2064,6 +2156,8 @@ function startupApp() {
   bindPhoneFormatter();
   updateMaskWarnings();
   updateFilterButtons();
+
+  migrateClientIds();
 
   if (installments.length && !installments.some(x => String(x.id) === String(selectedId))) {
     selectedId = installments[0].id;
