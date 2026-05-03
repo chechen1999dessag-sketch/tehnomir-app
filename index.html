@@ -142,7 +142,7 @@
     }
 
     body {
-      background: linear-gradient(180deg, #edf3f8 0%, #f8fafc 100%);
+      background: linear-gradient(180deg, #d5deea 0%, #e8eef5 100%);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Arial, sans-serif;
       letter-spacing: -0.01em;
@@ -154,7 +154,7 @@
     }
 
     .header {
-      background: linear-gradient(135deg, #111827 0%, #26364d 100%);
+      background: linear-gradient(135deg, #13233b 0%, #244266 100%);
       border-radius: 28px;
       padding: 24px 28px;
       box-shadow: 0 16px 38px rgba(17, 24, 39, .16);
@@ -172,7 +172,7 @@
 
     .card,
     .sync-box {
-      background: var(--card);
+      background: rgba(255,255,255,.90);
       border: 1px solid rgba(226,232,240,.95);
       border-radius: 24px;
       box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
@@ -191,7 +191,7 @@
     }
 
     input {
-      background: #f8fafc;
+      background: #f3f6fa;
       border: 1px solid #e2e8f0;
       border-radius: 14px;
       padding: 12px 13px;
@@ -256,7 +256,7 @@
     }
 
     th {
-      background: #f8fafc;
+      background: #f3f6fa;
       color: #64748b;
       font-size: 12px;
       text-transform: uppercase;
@@ -303,7 +303,7 @@
     }
 
     .box {
-      background: #f8fafc;
+      background: #f3f6fa;
       border: 1px solid #eef2f7;
       border-radius: 18px;
     }
@@ -358,6 +358,199 @@
       .card, .sync-box { box-shadow: none !important; border: 0 !important; }
     }
 
+  
+    .header .btn2 {
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(255,255,255,.75);
+      color: #13233b;
+      font-weight: 700;
+    }
+
+    .header .btn2:hover {
+      background: #ffffff;
+    }
+
+    .sync-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .sync-actions button {
+      min-width: 168px;
+    }
+
+    .section-title {
+      color: #172033;
+    }
+
+  
+    .filter-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:12px;
+    }
+    .chip{
+      border:none;
+      border-radius:999px;
+      padding:9px 14px;
+      font-size:13px;
+      font-weight:700;
+      cursor:pointer;
+      background:#e8edf5;
+      color:#23354d;
+      transition:all .18s ease;
+      box-shadow:0 1px 2px rgba(15,23,42,.06);
+    }
+    .chip:hover{ transform:translateY(-1px); background:#dce6f3; }
+    .chip.active{
+      background:linear-gradient(135deg,#223654 0%, #355986 100%);
+      color:#fff;
+      box-shadow:0 8px 20px rgba(34,54,84,.18);
+    }
+    .theme-toggle{
+      min-width:174px;
+    }
+    .mini-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-top:6px;
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      background:#eef3f8;
+      color:#34506f;
+    }
+    .trust-good{ background:#e8f7ee; color:#166534; }
+    .trust-warn{ background:#fff4da; color:#9a6700; }
+    .trust-bad{ background:#ffe4e6; color:#b42318; }
+    .trust-closed{ background:#e8efff; color:#29498a; }
+    .card h3{ margin-top:18px; margin-bottom:10px; }
+    .header p, #cloudStatus{ opacity:.95; }
+    input:focus, select:focus, textarea:focus{
+      outline:none;
+      border-color:#5b7fb0 !important;
+      box-shadow:0 0 0 4px rgba(91,127,176,.16);
+      background:#fff;
+    }
+    .btn, .btn2, .danger{
+      transition:transform .14s ease, box-shadow .18s ease, background .18s ease, opacity .18s ease;
+    }
+    .btn:hover, .btn2:hover, .danger:hover{
+      transform:translateY(-1px);
+      box-shadow:0 8px 18px rgba(15,23,42,.10);
+    }
+    .btn:active, .btn2:active, .danger:active{
+      transform:scale(.98);
+    }
+
+    body.dark-theme{
+      background:linear-gradient(180deg,#0c1422 0%, #131d2b 100%) !important;
+      color:#e6edf7;
+    }
+    body.dark-theme .card,
+    body.dark-theme .sync-box,
+    body.dark-theme .box,
+    body.dark-theme .contract{
+      background:rgba(18,27,40,.92) !important;
+      color:#e6edf7 !important;
+      border:1px solid rgba(255,255,255,.06);
+      box-shadow:0 14px 32px rgba(0,0,0,.22);
+    }
+    body.dark-theme .muted,
+    body.dark-theme .stat-title,
+    body.dark-theme .copy-note,
+    body.dark-theme .section-subtle{
+      color:#9fb0c6 !important;
+    }
+    body.dark-theme table th{
+      color:#b7c6d8 !important;
+      border-color:rgba(255,255,255,.08) !important;
+    }
+    body.dark-theme table td{
+      border-color:rgba(255,255,255,.06) !important;
+    }
+    body.dark-theme input{
+      background:#101a28 !important;
+      color:#edf4ff !important;
+      border:1px solid rgba(255,255,255,.08) !important;
+    }
+    body.dark-theme input::placeholder{ color:#7f94b0 !important; }
+    body.dark-theme .btn2{
+      background:#182537 !important;
+      color:#e9f1fc !important;
+      border:1px solid rgba(255,255,255,.07);
+    }
+    body.dark-theme .btn{
+      background:linear-gradient(135deg,#2e5b9a 0%, #4276bf 100%) !important;
+      color:#fff !important;
+    }
+    body.dark-theme .danger{
+      background:linear-gradient(135deg,#a52836 0%, #c03947 100%) !important;
+      color:#fff !important;
+    }
+    body.dark-theme .chip{
+      background:#162133 !important;
+      color:#bfd1e6 !important;
+      border:1px solid rgba(255,255,255,.05);
+    }
+    body.dark-theme .chip.active{
+      background:linear-gradient(135deg,#355e9a 0%, #4e7dc0 100%) !important;
+      color:#fff !important;
+      border-color:transparent !important;
+    }
+    body.dark-theme .selected-row{
+      background:#2b4568 !important;
+      color:#fff !important;
+    }
+    body.dark-theme .selected-row .muted{ color:#d7e3f3 !important; }
+    body.dark-theme .status{ background:#202f45 !important; color:#e8f0fd !important; }
+    body.dark-theme .overdue{ background:#4a2026 !important; color:#ffd8dd !important; }
+    body.dark-theme .closed{ background:#173625 !important; color:#c7f9d7 !important; }
+    body.dark-theme .sign-line{
+      border-top:2px solid rgba(255,255,255,.35) !important;
+      color:#d6e0ed !important;
+    }
+    body.dark-theme .header{
+      background:linear-gradient(135deg,#12203a 0%, #1f3a60 100%) !important;
+      border:1px solid rgba(255,255,255,.06);
+      box-shadow:0 18px 36px rgba(0,0,0,.22);
+    }
+    body.dark-theme .header .btn2{
+      background:rgba(255,255,255,.94) !important;
+      color:#102238 !important;
+    }
+    body.dark-theme .filter-row .chip:hover{
+      background:#1f314d !important;
+    }
+    body.dark-theme .three .box,
+    body.dark-theme .two .box{
+      background:#131e2d !important;
+    }
+
+    @media (max-width: 1100px){
+      .layout{ grid-template-columns:1fr !important; }
+      .grid4{ grid-template-columns:1fr 1fr !important; }
+    }
+    @media (max-width: 760px){
+      .grid4, .two, .three, .formgrid, .signatures, .sync-panel{
+        grid-template-columns:1fr !important;
+      }
+      .header{
+        padding:18px !important;
+      }
+      .header h1{
+        font-size:28px !important;
+      }
+      .theme-toggle{
+        min-width:unset;
+        width:100%;
+      }
+    }
+
   </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -380,7 +573,10 @@
       <h1>Рассрочка ТехноМир</h1>
       <p>Клиенты, оплаты, договор, печать и облачное хранение</p><p id="cloudStatus" style="margin-top:4px;color:#aaa;font-size:13px;">Подключение к облаку...</p>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn2" onclick="document.getElementById('fullName').focus()"></button><button class="btn2" onclick="logout()">Выйти</button></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn2 theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">🌙 Тёмный режим</button>
+      <button class="btn2" onclick="logout()">Выйти</button>
+    </div>
   </div>
 
   <div class="grid4 no-print">
@@ -416,6 +612,13 @@
   <div class="layout">
     <div class="card no-print">
       <input id="search" placeholder="Поиск по клиенту, телефону, товару, модели" oninput="render()" />
+      <div class="filter-row">
+        <button class="chip active" id="filter-all" onclick="setListFilter('all')">Все</button>
+        <button class="chip" id="filter-active" onclick="setListFilter('active')">Активные</button>
+        <button class="chip" id="filter-overdue" onclick="setListFilter('overdue')">Просрочки</button>
+        <button class="chip" id="filter-dueToday" onclick="setListFilter('dueToday')">Сегодня к оплате</button>
+        <button class="chip" id="filter-closed" onclick="setListFilter('closed')">Закрытые</button>
+      </div>
       <div style="overflow:auto;margin-top:12px;">
         <table>
           <thead><tr><th>Клиент</th><th>Товар</th><th>Остаток</th><th>Статус</th></tr></thead>
@@ -429,9 +632,9 @@
         <h2 class="section-title">Добавить рассрочку</h2>
         <div class="formgrid">
           <input id="fullName" placeholder="ФИО клиента">
-          <input id="phone" placeholder="Телефон">
+          <input id="phone" placeholder="8 (928) 965-23-17" inputmode="tel" maxlength="18">
           <input id="address" placeholder="Адрес">
-          <input id="passportNumber" placeholder="Серия и номер паспорта">
+          <input id="passportNumber" placeholder="96 13 257123" inputmode="numeric" maxlength="12">
           <input id="passportIssued" placeholder="Кем выдан">
           <input id="passportDate" type="date">
           <input id="product" placeholder="Товар">
@@ -446,7 +649,7 @@
         </div>
         <div class="actions">
           <button class="btn" onclick="addInstallment()">Сохранить</button>
-          <div class="muted">Сейчас данные сохраняются в браузере на этом устройстве. Облачную синхронизацию добавим отдельной версией.</div>
+          <div class="muted">Данные хранятся локально и при необходимости синхронизируются с облаком. Интерфейс поддерживает светлый и тёмный режим.</div>
         </div>
       </div>
 
@@ -497,6 +700,168 @@ function showToast(message, type = "success") {
     toast.style.transition = "all .2s ease";
   }, 2200);
   setTimeout(() => toast.remove(), 2600);
+}
+
+
+function formatPassportNumber(value) {
+  const digits = String(value || "").replace(/\D/g, "").slice(0, 10);
+  const p1 = digits.slice(0, 2);
+  const p2 = digits.slice(2, 4);
+  const p3 = digits.slice(4, 10);
+  return [p1, p2, p3].filter(Boolean).join(" ");
+}
+
+function bindPassportFormatter() {
+  const input = document.getElementById("passportNumber");
+  if (!input || input.dataset.bound === "1") return;
+  input.dataset.bound = "1";
+  input.addEventListener("input", () => {
+    const start = input.selectionStart;
+    input.value = formatPassportNumber(input.value);
+    try { input.setSelectionRange(input.value.length, input.value.length); } catch (e) {}
+  });
+}
+
+
+let listFilter = "all";
+
+function formatPhoneNumber(value) {
+  let digits = String(value || "").replace(/\D/g, "");
+  if (!digits) return "";
+  if (digits[0] === "7") digits = "8" + digits.slice(1);
+  if (digits[0] !== "8" && digits.length <= 10) digits = "8" + digits;
+  digits = digits.slice(0, 11);
+
+  let result = digits.slice(0, 1);
+  if (digits.length > 1) result += " (" + digits.slice(1, 4);
+  if (digits.length >= 4) result += ")";
+  if (digits.length > 4) result += " " + digits.slice(4, 7);
+  if (digits.length > 7) result += "-" + digits.slice(7, 9);
+  if (digits.length > 9) result += "-" + digits.slice(9, 11);
+  return result;
+}
+
+function bindPhoneFormatter() {
+  const input = document.getElementById("phone");
+  if (!input || input.dataset.bound === "1") return;
+  input.dataset.bound = "1";
+  input.addEventListener("input", () => {
+    input.value = formatPhoneNumber(input.value);
+    try { input.setSelectionRange(input.value.length, input.value.length); } catch (e) {}
+  });
+}
+
+function clientTrust(item) {
+  const plan = plannedSchedule(item);
+  const overdueCount = plan.filter(p => scheduleStatus(item, p) === "Просрочка").length;
+  if (status(item) === "Закрыта") return { label: "Закрыта", cls: "trust-closed" };
+  if (overdueCount === 0) return { label: "Надёжный", cls: "trust-good" };
+  if (overdueCount === 1) return { label: "Есть просрочка", cls: "trust-warn" };
+  return { label: "Проблемный", cls: "trust-bad" };
+}
+
+function setListFilter(mode) {
+  listFilter = mode;
+  updateFilterButtons();
+  render();
+}
+
+function updateFilterButtons() {
+  ["all","active","overdue","dueToday","closed"].forEach(mode => {
+    const el = document.getElementById("filter-" + mode);
+    if (!el) return;
+    el.classList.toggle("active", listFilter === mode);
+  });
+}
+
+function filteredInstallments(q) {
+  let list = installments.filter(x =>
+    [x.fullName, x.phone, x.product, x.model].join(" ").toLowerCase().includes(q)
+  );
+
+  if (listFilter === "active") {
+    list = list.filter(x => status(x) === "Активная");
+  } else if (listFilter === "overdue") {
+    list = list.filter(x => status(x) === "Просрочка");
+  } else if (listFilter === "closed") {
+    list = list.filter(x => status(x) === "Закрыта");
+  } else if (listFilter === "dueToday") {
+    list = list.filter(item =>
+      plannedSchedule(item).some(p => p.dueDate === today() && scheduleStatus(item, p) !== "Оплачен")
+    );
+  }
+  return list;
+}
+
+function updateThemeToggleLabel() {
+  const btn = document.getElementById("themeToggleBtn");
+  if (!btn) return;
+  const isDark = document.body.classList.contains("dark-theme");
+  btn.textContent = isDark ? "☀️ Светлый режим" : "🌙 Тёмный режим";
+}
+
+function initTheme() {
+  const saved = localStorage.getItem("tehnomir_theme");
+  if (saved === "dark") {
+    document.body.classList.add("dark-theme");
+  } else {
+    document.body.classList.remove("dark-theme");
+  }
+  updateThemeToggleLabel();
+}
+
+function toggleTheme() {
+  document.body.classList.toggle("dark-theme");
+  localStorage.setItem(
+    "tehnomir_theme",
+    document.body.classList.contains("dark-theme") ? "dark" : "light"
+  );
+  updateThemeToggleLabel();
+  showToast(
+    document.body.classList.contains("dark-theme") ? "Тёмный режим включён" : "Светлый режим включён",
+    "info"
+  );
+}
+
+function printContract() {
+  const item = installments.find(x => x.id === selectedId);
+  if (!item) {
+    showToast("Сначала выбери рассрочку", "error");
+    return;
+  }
+  const contractNode = document.querySelector("#details .contract-body");
+  if (!contractNode) {
+    showToast("Договор не найден", "error");
+    return;
+  }
+
+  const copy = contractNode.outerHTML;
+  const style = `
+    <style>
+      @page { margin: 18mm 14mm; }
+      body { font-family: Arial, sans-serif; color:#111; }
+      .contract-body { font-size: 14px; line-height: 1.45; }
+      .contract-body h1 { text-align:center; font-size: 22px; margin: 0 0 16px; }
+      .contract-body h2 { font-size: 16px; margin: 18px 0 8px; }
+      .contract-body p { margin: 7px 0; }
+      table { width:100%; border-collapse: collapse; margin-top: 10px; }
+      th, td { border-bottom: 1px solid #ddd; padding: 8px 6px; text-align:left; font-size:13px; }
+      .signatures { display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:40px; }
+      .sign-line { border-top:2px solid #222; padding-top:10px; text-align:center; }
+      .copy-note { margin-top: 14px; font-size:12px; color:#666; text-align:center; }
+      .page-break { page-break-before: always; }
+    </style>
+  `;
+
+  const printWindow = window.open("", "_blank");
+  printWindow.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Договор рассрочки</title>${style}</head><body>${copy}<div class="page-break"></div>${copy}</body></html>`);
+  printWindow.document.close();
+  printWindow.focus();
+  showToast("Открывается печать договора", "info");
+  setTimeout(() => {
+    printWindow.print();
+    printWindow.close();
+  }, 300);
 }
 
 const APP_PASSWORD = "y5cm2j9e";
@@ -805,15 +1170,29 @@ function addInstallment(){
   for (const f of fields) {
     const el = document.getElementById(f);
     item[f] = el ? el.value.trim() : "";
+    if (f === "phone") item[f] = formatPhoneNumber(item[f]);
+    if (f === "passportNumber") item[f] = formatPassportNumber(item[f]);
   }
   if (!item.fullName || !item.product || !item.totalPrice) {
-    alert("Заполни ФИО, товар и стоимость.");
+    showToast("Заполни ФИО, товар и стоимость", "error");
     return;
   }
   if (!item.firstPaymentDate) item.firstPaymentDate = nextMonthSameDay();
   item.totalPrice = Number(item.totalPrice);
   item.downPayment = Number(item.downPayment || 0);
   item.months = Math.min(12, Math.max(1, Number(item.months || 1)));
+  if (item.totalPrice <= 0) {
+    showToast("Стоимость должна быть больше нуля", "error");
+    return;
+  }
+  if (item.downPayment < 0) {
+    showToast("Первый взнос не может быть отрицательным", "error");
+    return;
+  }
+  if (item.downPayment > item.totalPrice) {
+    showToast("Первый взнос не может быть больше стоимости", "error");
+    return;
+  }
   installments.unshift(item);
   selectedId = item.id;
   queueChange("upsert", item);
@@ -835,7 +1214,7 @@ function addPayment(){
   if (!item) return;
   const amount = Number(document.getElementById("payAmount").value || 0);
   const date = document.getElementById("payDate").value || today();
-  const comment = document.getElementById("payComment").value || "Оплата";
+  const comment = "Оплата";
   if (!amount || amount <= 0) return alert("Укажи сумму оплаты.");
   item.payments = item.payments || [];
   item.payments.push({id: Date.now(), amount, paidAt: date, comment});
@@ -858,7 +1237,6 @@ function quickNextPayment(){
   if (!next) return alert("Рассрочка уже закрыта.");
   document.getElementById("payAmount").value = next.amount;
   document.getElementById("payDate").value = today();
-  document.getElementById("payComment").value = "Оплата";
   addPayment();
 }
 function editPayment(paymentId){
@@ -911,14 +1289,16 @@ function render(){
   const cloudEl = document.getElementById("cloudStatus");
   if (cloudEl) cloudEl.textContent = cloudReady ? "Облако подключено: данные синхронизируются" : "Облако не подключено: данные временно сохраняются только в браузере";
   const q = (document.getElementById("search")?.value || "").toLowerCase();
-  const list = installments.filter(x => [x.fullName,x.phone,x.product,x.model].join(" ").toLowerCase().includes(q));
+  const list = filteredInstallments(q);
+  updateFilterButtons();
   document.getElementById("list").innerHTML = list.map(item => {
     const s = status(item);
     const cls = s === "Просрочка" ? "overdue" : s === "Закрыта" ? "closed" : "";
     const selected = item.id === selectedId ? "selected-row" : "";
     const rowTint = s === "Просрочка" ? "background:#fff1f2;" : s === "Закрыта" ? "background:#f0fdf4;" : "";
+    const trust = clientTrust(item);
     return `<tr class="${selected}" style="${rowTint}" onclick="selectItem(${item.id})">
-      <td><b>${item.fullName}</b><br><span class="muted">${item.phone || ""}</span></td>
+      <td><b>${item.fullName}</b><br><span class="muted">${formatPhoneNumber(item.phone || "")}</span><br><span class="mini-badge ${trust.cls}">${trust.label}</span></td>
       <td>${item.product}<br><span class="muted">Модель: ${item.model || "—"}</span></td>
       <td><b>${rub(Number(item.totalPrice)-totalPaid(item))}</b></td>
       <td><span class="status ${cls}">${s}</span></td>
@@ -964,13 +1344,13 @@ function render(){
 
   details.innerHTML = `
     <div class="no-print" style="display:flex;justify-content:space-between;gap:10px;align-items:start;">
-      <div><h2 class="section-title">Карточка рассрочки</h2><p class="muted">Выбран: <b>${item.fullName}</b></p></div>
+      <div><h2 class="section-title">Карточка рассрочки</h2><p class="muted">Выбран: <b>${item.fullName}</b></p><p><span class="mini-badge ${clientTrust(item).cls}">${clientTrust(item).label}</span></p></div>
       
     </div>
 
     <div class="no-print">
       <div class="two">
-        <div class="box"><b>Клиент</b><p>${item.fullName}</p><p>${item.phone || ""}</p><p>${item.address || ""}</p><p>Паспорт: ${item.passportNumber || "—"}<br>Кем выдан: ${item.passportIssued || "—"}<br>Дата выдачи: ${passportDateFormat(item.passportDate)}</p></div>
+        <div class="box"><b>Клиент</b><p>${item.fullName}</p><p>${formatPhoneNumber(item.phone || "")}</p><p>${item.address || ""}</p><p>Паспорт: ${item.passportNumber || "—"}<br>Кем выдан: ${item.passportIssued || "—"}<br>Дата выдачи: ${passportDateFormat(item.passportDate)}</p></div>
         <div class="box"><b>Товар</b><p>${item.product}</p><p>Модель: ${item.model || "—"}</p><p>Стоимость: ${rub(item.totalPrice)}</p></div>
       </div>
       <div class="three">
@@ -983,16 +1363,15 @@ function render(){
       <table><thead><tr><th>№</th><th>Дата</th><th>Сумма</th><th>Статус</th></tr></thead><tbody>${planRowsForApp}</tbody></table>
 
       <h3>Принять оплату</h3>
-      <div class="three">
+      <div class="two">
         <input id="payAmount" type="number" placeholder="Сумма оплаты">
         <input id="payDate" type="date" value="${today()}">
-        <input id="payComment" placeholder="Комментарий" value="Оплата">
       </div>
       <div class="two" style="margin-top:8px;"><button class="btn" onclick="addPayment()">Принять оплату</button><button class="btn2" onclick="quickNextPayment()">Оплатить следующий платёж</button></div>
 
       <h3>История оплат</h3>
       ${paymentRows ? `<table><thead><tr><th>Дата</th><th>Сумма</th><th>Комментарий</th><th>Действие</th></tr></thead><tbody>${paymentRows}</tbody></table>` : `<p class="muted">Пока оплат нет, кроме первого взноса.</p>`}
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;"><button class="btn" id="printBtn" onclick="showToast('Открывается печать договора', 'info'); setTimeout(() => window.print(), 250)">Печать договора</button><button class="danger" onclick="deleteItem()">Удалить рассрочку</button></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;"><button class="btn" id="printBtn" onclick="printContract()">Печать договора</button><button class="danger" onclick="deleteItem()">Удалить рассрочку</button></div>
     </div>
 
     <div class="contract-body">
@@ -1004,7 +1383,7 @@ function render(){
       <h2>1. Стороны договора</h2>
       <p>Магазин «ТехноМир», далее «Продавец», передаёт товар Покупателю на условиях рассрочки платежа.</p>
       <p><b>Покупатель:</b> ${item.fullName}</p>
-      <p><b>Телефон:</b> ${item.phone || "—"}</p>
+      <p><b>Телефон:</b> ${formatPhoneNumber(item.phone || "") || "—"}</p>
       <p><b>Адрес:</b> ${item.address || "—"}</p>
       <p><b>Паспорт:</b><br>Серия и номер: ${item.passportNumber || "—"}<br>Кем выдан: ${item.passportIssued || "—"}<br>Дата выдачи: ${passportDateFormat(item.passportDate)}</p>
 
