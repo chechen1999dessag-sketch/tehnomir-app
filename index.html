@@ -946,6 +946,23 @@
       color: #dbe7ff !important;
     }
 
+
+    body.dark-theme .stat-value {
+      color: #f8fbff !important;
+      opacity: 1 !important;
+      text-shadow: 0 1px 10px rgba(255,255,255,.08);
+    }
+
+    body.dark-theme .grid4 .card .stat-value,
+    body.dark-theme .grid4 .card div[id] {
+      color: #f8fbff !important;
+      opacity: 1 !important;
+    }
+
+    body.dark-theme .grid4 .card {
+      background: rgba(15, 33, 54, .96) !important;
+    }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -966,7 +983,7 @@
   <div class="header no-print">
     <div>
       <h1>Рассрочка ТехноМир</h1>
-      <p>Клиенты, оплаты, договор, печать и облачное хранение · v25</p><p id="cloudStatus" style="margin-top:4px;color:#aaa;font-size:13px;">Подключение к облаку...</p>
+      <p>Клиенты, оплаты, договор, печать и облачное хранение · v26</p><p id="cloudStatus" style="margin-top:4px;color:#aaa;font-size:13px;">Подключение к облаку...</p>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
       <button class="btn2 theme-toggle" id="themeToggleBtn" onclick="toggleTheme()"><span class="btn-icon">🌙</span><span>Тёмный режим</span></button>
