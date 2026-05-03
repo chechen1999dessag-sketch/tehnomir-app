@@ -727,6 +727,130 @@
       *, *::before, *::after { animation: none !important; transition: none !important; }
     }
 
+
+
+    /* --- v19 branded dark-blue refinements --- */
+    body.dark-theme {
+      background:
+        radial-gradient(circle at top left, rgba(65, 120, 214, .16), transparent 22%),
+        radial-gradient(circle at top right, rgba(29, 78, 216, .10), transparent 24%),
+        linear-gradient(180deg, #12233a 0%, #16304d 52%, #122a44 100%) !important;
+      color: #e8f1fb;
+    }
+    body.dark-theme .header {
+      background: linear-gradient(135deg, #173152 0%, #22456f 100%) !important;
+      border: 1px solid rgba(125, 164, 224, .16) !important;
+      box-shadow: 0 18px 40px rgba(8, 18, 33, .32) !important;
+    }
+    body.dark-theme .header p,
+    body.dark-theme #cloudStatus {
+      color: #c3d5ec !important;
+    }
+    body.dark-theme .card,
+    body.dark-theme .sync-box,
+    body.dark-theme .box,
+    body.dark-theme .contract {
+      background: rgba(15, 33, 54, .92) !important;
+      border: 1px solid rgba(95, 137, 198, .18) !important;
+      box-shadow: 0 14px 28px rgba(7, 15, 28, .24) !important;
+      color: #edf4ff !important;
+    }
+    body.dark-theme .muted,
+    body.dark-theme .stat-title,
+    body.dark-theme .copy-note,
+    body.dark-theme .section-subtle {
+      color: #9cb3ce !important;
+    }
+    body.dark-theme table {
+      color: #edf4ff;
+    }
+    body.dark-theme thead th {
+      background: rgba(207, 223, 245, .10) !important;
+      color: #dbe9fb !important;
+      border-bottom-color: rgba(125, 164, 224, .18) !important;
+    }
+    body.dark-theme table th,
+    body.dark-theme table td {
+      border-bottom-color: rgba(125, 164, 224, .12) !important;
+    }
+    body.dark-theme tbody tr:hover {
+      background: rgba(96, 141, 211, .08) !important;
+    }
+    body.dark-theme .selected-row {
+      background: linear-gradient(135deg, #254b79, #315d96) !important;
+      color: #fff !important;
+      box-shadow: inset 0 0 0 1px rgba(190, 214, 248, .18);
+    }
+    body.dark-theme .selected-row .muted {
+      color: #d9e8fb !important;
+    }
+    body.dark-theme .status {
+      background: rgba(210, 224, 244, .14);
+      color: #dbe9fb;
+      border: 1px solid rgba(184, 206, 235, .10);
+    }
+    body.dark-theme .selected-row .status {
+      background: #dce8fb !important;
+      color: #1c3c66 !important;
+      border-color: transparent !important;
+    }
+    body.dark-theme .overdue,
+    body.dark-theme .status.overdue {
+      background: rgba(177, 49, 65, .34) !important;
+      color: #ffdce1 !important;
+    }
+    body.dark-theme .closed,
+    body.dark-theme .status.closed {
+      background: rgba(25, 118, 66, .24) !important;
+      color: #d7f8e0 !important;
+    }
+    body.dark-theme .mini-badge.trust-good { background: rgba(29, 113, 70, .22) !important; color: #d8f8e3 !important; }
+    body.dark-theme .mini-badge.trust-warn { background: rgba(168, 112, 11, .22) !important; color: #ffe6aa !important; }
+    body.dark-theme .mini-badge.trust-bad { background: rgba(176, 43, 43, .26) !important; color: #ffd5d5 !important; }
+    body.dark-theme .mini-badge.trust-closed { background: rgba(67, 104, 190, .26) !important; color: #dce7ff !important; }
+    body.dark-theme .chip {
+      background: rgba(29, 54, 84, .94) !important;
+      border: 1px solid rgba(98, 139, 201, .22) !important;
+      color: #c6daf5 !important;
+    }
+    body.dark-theme .chip.active {
+      background: linear-gradient(135deg, #3c6db1 0%, #5685c7 100%) !important;
+      color: #fff !important;
+      border-color: transparent !important;
+    }
+    body.dark-theme .btn2,
+    body.dark-theme .soft-danger {
+      background: rgba(28, 51, 80, .96) !important;
+      color: #e6f0fc !important;
+      border: 1px solid rgba(98, 139, 201, .18) !important;
+    }
+    body.dark-theme .btn {
+      background: linear-gradient(135deg, #3b6aab 0%, #5989cb 100%) !important;
+      color: #fff !important;
+    }
+    body.dark-theme .danger {
+      background: linear-gradient(135deg, #9e3141 0%, #ba4254 100%) !important;
+    }
+    body.dark-theme input {
+      background: rgba(13, 32, 55, .96) !important;
+      border: 1px solid rgba(89, 126, 184, .20) !important;
+      color: #f1f6ff !important;
+    }
+    body.dark-theme input::placeholder {
+      color: #8ea9c8 !important;
+    }
+    body.dark-theme input:focus {
+      background: rgba(17, 39, 67, .98) !important;
+      border-color: #6797df !important;
+      box-shadow: 0 0 0 4px rgba(103, 151, 223, .14) !important;
+    }
+    body.dark-theme .stat-icon {
+      background: rgba(89, 137, 210, .22) !important;
+    }
+    body.dark-theme .ripple {
+      background: rgba(255,255,255,.28);
+    }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -808,9 +932,9 @@
         <h2 class="section-title">Добавить рассрочку</h2>
         <div class="formgrid">
           <input id="fullName" placeholder="ФИО клиента">
-          <input id="phone" placeholder="Телефон" inputmode="tel" maxlength="18" title="Номер форматируется автоматически: 8 (938) 086-64-51">
+          <input id="phone" placeholder="Телефон" inputmode="tel" title="Номер форматируется автоматически: 8 (938) 086-64-51">
           <input id="address" placeholder="Адрес">
-          <input id="passportNumber" placeholder="Серия и номер паспорта" inputmode="numeric" maxlength="12" title="Форматируется автоматически: 96 13 257213">
+          <input id="passportNumber" placeholder="Серия и номер паспорта" inputmode="numeric" title="Форматируется автоматически: 96 13 257213">
           <input id="passportIssued" placeholder="Кем выдан">
           <input id="passportDate" type="date">
           <input id="product" placeholder="Товар">
@@ -992,8 +1116,9 @@ function toggleTheme() {
     document.body.classList.contains("dark-theme") ? "dark" : "light"
   );
   updateThemeToggleLabel();
+  render();
   showToast(
-    document.body.classList.contains("dark-theme") ? "Тёмный режим включён" : "Светлый режим включён",
+    document.body.classList.contains("dark-theme") ? "Включён тёмно-синий режим" : "Светлый режим включён",
     "info"
   );
 }
@@ -1470,7 +1595,12 @@ function render(){
     const s = status(item);
     const cls = s === "Просрочка" ? "overdue" : s === "Закрыта" ? "closed" : "";
     const selected = item.id === selectedId ? "selected-row" : "";
-    const rowTint = s === "Просрочка" ? "background:#fff1f2;" : s === "Закрыта" ? "background:#f0fdf4;" : "";
+    const isDarkTheme = document.body.classList.contains("dark-theme");
+    const rowTint = s === "Просрочка"
+      ? (isDarkTheme ? "background:rgba(136,43,59,.24);" : "background:#fff1f2;")
+      : s === "Закрыта"
+        ? (isDarkTheme ? "background:rgba(22,101,52,.16);" : "background:#f0fdf4;")
+        : "";
     const trust = clientTrust(item);
     return `<tr class="${selected}" style="${rowTint}" onclick="selectItem(${item.id})">
       <td><b>${item.fullName}</b><br><span class="muted">${formatPhoneNumber(item.phone || "")}</span><br><span class="mini-badge ${trust.cls}">${trust.label}</span></td>
