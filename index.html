@@ -1380,6 +1380,8 @@ function printContract() {
 }
 
 const APP_PASSWORD = "y5cm2j9e";
+const SELLER_PHONE = "Ибрагим: 8 (963) 707-46-66, 8 (938) 999-90-44, 8 (928) 946-64-51; Асят: 8 (928) 737-05-42";
+const SELLER_PAYMENT_TEXT = "Оплата производится наличными в магазине либо переводом по реквизитам, согласованным с Продавцом. Для уточнения способа оплаты Покупатель может связаться по номерам: Ибрагим — 8 (963) 707-46-66, 8 (938) 999-90-44, 8 (928) 946-64-51; Асят — 8 (928) 737-05-42.";
 
 function login() {
   const value = document.getElementById("loginPassword").value;
@@ -2123,6 +2125,7 @@ function render(){
       <h1>ДОГОВОР РАССРОЧКИ</h1>
       <p><b>№ договора:</b> ${item.id}</p>
       <p><b>Магазин:</b> ТехноМир</p>
+      <p><b>Контакт для связи и оплаты:</b> ${SELLER_PHONE}</p>
       <p><b>Дата оформления:</b> ${formatDate(item.createdAt || today())}</p>
 
       <h2>1. Стороны договора</h2>
@@ -2141,6 +2144,8 @@ function render(){
       <p>Покупатель внёс первый взнос в размере <b>${rub(item.downPayment)}</b>.</p>
       <p>Оставшаяся сумма к оплате составляет <b>${rub(Number(item.totalPrice) - Number(item.downPayment))}</b>.</p>
       <p>Оставшаяся сумма делится равными ежемесячными платежами сроком на <b>${item.months}</b> мес.</p>
+      <p><b>Как и куда оплачивать:</b> ${SELLER_PAYMENT_TEXT}</p>
+      <p><b>Телефон для вопросов по оплате:</b> ${SELLER_PHONE}</p>
 
       <h2>4. График дат оплат</h2>
       <table><thead><tr><th>№</th><th>Дата оплаты</th><th>Сумма</th></tr></thead><tbody>${contractDateRows}</tbody></table>
