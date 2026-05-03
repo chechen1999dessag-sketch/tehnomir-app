@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Договор рассрочки — ТехноМир</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f5; color: #111; }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 16px; }
+    .login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: #111; }
+    .login-card { width: 100%; max-width: 420px; background: white; border-radius: 24px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,.25); }
+    .login-card h1 { margin: 0 0 8px; }
+    .login-card p { margin: 0 0 18px; color: #666; }
+    .hidden { display: none !important; }
+    .header { background: #111; color: white; border-radius: 22px; padding: 22px; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+    .header h1 { margin: 0; font-size: 26px; }
+    .header p { margin: 6px 0 0; color: #c7c7c7; }
+    .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 14px 0; }
+    .card { background: white; border-radius: 20px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .stat-title { color: #666; font-size: 14px; }
+    .stat-value { font-size: 26px; font-weight: 700; margin-top: 8px; }
+    .layout { display: grid; grid-template-columns: 1.25fr .85fr; gap: 14px; }
+    input, button { font: inherit; }
+    input { width: 100%; padding: 11px; border: 1px solid #ddd; border-radius: 12px; background: white; }
+    button { border: 0; border-radius: 14px; padding: 11px 14px; cursor: pointer; font-weight: 700; }
+    .btn { background: #111; color: white; }
+    .btn2 { background: #eee; color: #111; }
+    .danger { background: #b91c1c; color: white; }
+    .soft-danger { background: #fee2e2; color: #991b1b; }
+    .formgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { text-align: left; color: #666; font-weight: 600; }
+    th, td { padding: 10px; border-bottom: 1px solid #eee; vertical-align: top; }
+    tbody tr { cursor: pointer; }
+    tbody tr:hover { background: #fafafa; }
+    .selected-row { background: #111 !important; color: white; }
+    .selected-row .muted { color: #ddd; }
+    .selected-row .status { background: white; color: #111; }
+    .status { display: inline-block; padding: 5px 9px; border-radius: 999px; background: #eee; font-size: 12px; font-weight: 700; }
+    .overdue { background: #fee2e2; color: #991b1b; }
+    .closed { background: #dcfce7; color: #166534; }
+    .muted { color: #666; font-size: 13px; }
+    .section-title { font-size: 18px; font-weight: 800; margin: 0 0 12px; }
+    .box { background: #fafafa; border-radius: 16px; padding: 14px; margin-bottom: 10px; }
+    .actions { display: grid; gap: 8px; margin-top: 10px; }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .three { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .contract { background: white; }
+    .contract-body { font-size: 14px; line-height: 1.5; }
+    .contract-body h1 { text-align: center; font-size: 22px; margin: 0 0 18px; }
+    .contract-body h2 { font-size: 16px; margin: 20px 0 8px; }
+    .contract-body p { margin: 7px 0; }
+    .signatures { display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:45px; }
+    .sign-line { border-top:1px solid #111; text-align:center; padding-top:8px; }
+    .copy-note { text-align:center; font-size:12px; color:#555; margin-top:20px; }
+    @media (max-width: 900px) {
+      .grid4, .layout, .formgrid, .two, .three { grid-template-columns: 1fr; }
+      .header { display: block; }
+    }
+    @page { size: A4; margin: 12mm; }
+    @media print {
+      body { background: white; }
+      .no-print { display: none !important; }
+      .wrap { max-width: none; padding: 0; }
+      .card { box-shadow: none; border-radius: 0; padding: 0; }
+      .print-card { display: block !important; }
+      .contract-body { font-size: 12.5px; }
+      table { font-size: 12px; }
+      th, td { padding: 6px; }
+      .contract { padding: 0; }
+    }
+  </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <h1>ТехноМир</h1>
+    <p>Вход в учёт рассрочки</p>
+    <input id="loginPassword" type="password" placeholder="Пароль"><label style="display:flex;align-items:center;gap:6px;margin-top:8px;"><input type="checkbox" id="rememberMe" checked> Запомнить на этом устройстве</label>
+    <button class="btn" style="width:100%;margin-top:10px;" onclick="login()">Войти</button>
+    <div id="loginError" class="muted" style="margin-top:10px;color:#b91c1c;"></div>
+    <p class="muted" style="margin-top:14px;"></p>
+  </div>
+</div>
+<div id="appScreen" class="hidden">
+<div class="wrap">
+  <div class="header no-print">
+    <div>
+      <h1>Рассрочка ТехноМир</h1>
+      <p>Клиенты, оплаты, договор, печать и облачное хранение</p><p id="cloudStatus" style="margin-top:4px;color:#aaa;font-size:13px;">Подключение к облаку...</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn2" onclick="document.getElementById('fullName').focus()">+ Добавить рассрочку</button><button class="btn2" onclick="logout()">Выйти</button></div>
+  </div>
+
+  <div class="grid4 no-print">
+    <div class="card"><div class="stat-title">Сегодня к оплате</div><div id="dueToday" class="stat-value">0</div></div>
+    <div class="card"><div class="stat-title">Просрочки</div><div id="overdueCount" class="stat-value">0</div></div>
+    <div class="card"><div class="stat-title">Поступило сегодня</div><div id="receivedToday" class="stat-value">0 ₽</div></div>
+    <div class="card"><div class="stat-title">Общий долг</div><div id="totalDebt" class="stat-value">0 ₽</div></div>
+  </div>
+
+  <div class="layout">
+    <div class="card no-print">
+      <input id="search" placeholder="Поиск по клиенту, телефону, товару, модели" oninput="render()" />
+      <div style="overflow:auto;margin-top:12px;">
+        <table>
+          <thead><tr><th>Клиент</th><th>Товар</th><th>Остаток</th><th>Статус</th></tr></thead>
+          <tbody id="list"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <div class="card no-print">
+        <h2 class="section-title">Добавить рассрочку</h2>
+        <div class="formgrid">
+          <input id="fullName" placeholder="ФИО клиента">
+          <input id="phone" placeholder="Телефон">
+          <input id="address" placeholder="Адрес">
+          <input id="passportNumber" placeholder="Серия и номер паспорта">
+          <input id="passportIssued" placeholder="Кем выдан">
+          <input id="passportDate" type="date">
+          <input id="product" placeholder="Товар">
+          <input id="model" placeholder="Модель">
+          <input id="totalPrice" type="number" placeholder="Стоимость">
+          <input id="downPayment" type="number" placeholder="Первый взнос">
+          <input id="months" type="number" min="1" max="12" value="6" placeholder="Срок, месяцев">
+          <div>
+            <div class="muted" style="margin:0 0 4px 2px;">Дата первого платежа</div>
+            <input id="firstPaymentDate" type="date" title="Дата первого ежемесячного платежа">
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn" onclick="addInstallment()">Сохранить</button>
+          <div class="muted">Сейчас данные сохраняются в браузере на этом устройстве. Облачную синхронизацию добавим отдельной версией.</div>
+        </div>
+      </div>
+
+      <div class="card print-card contract" id="details" style="margin-top:14px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const APP_PASSWORD = "y5cm2j9e";
+
+function login() {
+  const value = document.getElementById("loginPassword").value;
+  const remember = document.getElementById("rememberMe")?.checked;
+  if (value === APP_PASSWORD) {
+    if (remember) {
+      localStorage.setItem("tehnomir_logged_in", "1");
+    } else {
+      sessionStorage.setItem("tehnomir_logged_in", "1");
+    }
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("appScreen").classList.remove("hidden");
+    render();
+  } else {
+    document.getElementById("loginError").textContent = "Неверный пароль";
+  }
+}
+
+function logout() {
+  localStorage.removeItem("tehnomir_logged_in");
+  location.reload();
+}
+
+function checkLogin() {
+  const ok = localStorage.getItem("tehnomir_logged_in") === "1" || sessionStorage.getItem("tehnomir_logged_in") === "1";
+  document.getElementById("loginScreen").classList.toggle("hidden", ok);
+  document.getElementById("appScreen").classList.toggle("hidden", !ok);
+}
+
+function prefillDefaultPaymentDate() {
+  const el = document.getElementById("firstPaymentDate");
+  if (el && !el.value) el.value = nextMonthSameDay();
+}
+
+const KEY = "tehnomir_installments_cloud_backup";
+const SUPABASE_URL = "https://lvgmpdowceydkbnlnvct.supabase.co";
+const SUPABASE_KEY = "sb_publishable_woekH2OEjXmtd-b_NYfbbA_QKIfukKK";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let installments = JSON.parse(localStorage.getItem(KEY) || "[]");
+let selectedId = installments[0]?.id || null;
+let cloudReady = false;
+
+async function loadCloud() {
+  try {
+    const { data, error } = await supabaseClient
+      .from("installments")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+
+    installments = (data || []).map(row => row.data);
+    selectedId = installments[0]?.id || null;
+    localStorage.setItem(KEY, JSON.stringify(installments));
+    cloudReady = true;
+    render();
+  } catch (e) {
+    console.warn("Cloud load error:", e);
+    cloudReady = false;
+    render();
+  }
+}
+
+async function save() {
+  localStorage.setItem(KEY, JSON.stringify(installments));
+
+  if (!cloudReady) return;
+
+  try {
+    const rows = installments.map(item => ({
+      id: String(item.id),
+      data: item,
+      updated_at: new Date().toISOString()
+    }));
+
+    if (rows.length) {
+      const { error } = await supabaseClient
+        .from("installments")
+        .upsert(rows, { onConflict: "id" });
+      if (error) throw error;
+    }
+  } catch (e) {
+    console.warn("Cloud save error:", e);
+  }
+}
+
+loadCloud();
+function rub(v){ return Math.round(Number(v || 0)).toLocaleString("ru-RU") + " ₽"; }
+function today(){ return new Date().toISOString().slice(0,10); }
+function formatDate(d){ return d ? new Date(d).toLocaleDateString("ru-RU") : "—"; }
+function passportDateFormat(d){ return d ? new Date(d).toLocaleDateString("ru-RU") : "—"; }
+function addMonths(dateString, months) {
+  const d = new Date(dateString);
+  const day = d.getDate();
+  d.setMonth(d.getMonth() + months);
+  if (d.getDate() !== day) d.setDate(0);
+  return d.toISOString().slice(0,10);
+}
+
+function nextMonthSameDay() {
+  return addMonths(today(), 1);
+}
+function plannedSchedule(item){
+  const rest = Number(item.totalPrice) - Number(item.downPayment);
+  const base = Math.floor(rest / Number(item.months));
+  const remainder = rest - base * Number(item.months);
+  return Array.from({length: Number(item.months)}, (_, i) => ({
+    number:i+1,
+    dueDate:addMonths(item.firstPaymentDate, i),
+    amount:i === Number(item.months) - 1 ? base + remainder : base
+  }));
+}
+function sumPayments(item){ return (item.payments || []).reduce((s,p)=>s+Number(p.amount||0),0); }
+function totalPaid(item){ return Number(item.downPayment || 0) + sumPayments(item); }
+function paidByToday(item){ return totalPaid(item); }
+function scheduleStatus(item, p){
+  const required = Number(item.downPayment || 0) + plannedSchedule(item).filter(x => x.number <= p.number).reduce((s,x)=>s+Number(x.amount),0);
+  const paid = paidByToday(item);
+  if (paid >= required) return "Оплачен";
+  if (p.dueDate < today()) return "Просрочен";
+  return "Ожидается";
+}
+function status(item){
+  if (Number(item.totalPrice) - totalPaid(item) <= 0) return "Закрыта";
+  if (plannedSchedule(item).some(p => scheduleStatus(item,p) === "Просрочен")) return "Просрочка";
+  return "Активная";
+}
+function addInstallment(){
+  const fields = ["fullName","phone","address","passportNumber","passportIssued","passportDate","product","model","totalPrice","downPayment","months","firstPaymentDate"];
+  const item = { id: Date.now(), payments: [], createdAt: today() };
+  for (const f of fields) {
+    const el = document.getElementById(f);
+    item[f] = el ? el.value.trim() : "";
+  }
+  if (!item.fullName || !item.product || !item.totalPrice) {
+    alert("Заполни ФИО, товар и стоимость.");
+    return;
+  }
+  if (!item.firstPaymentDate) item.firstPaymentDate = nextMonthSameDay();
+  item.totalPrice = Number(item.totalPrice);
+  item.downPayment = Number(item.downPayment || 0);
+  item.months = Math.min(12, Math.max(1, Number(item.months || 1)));
+  installments.unshift(item);
+  selectedId = item.id;
+  save();
+  fields.forEach(f => { 
+    const el = document.getElementById(f);
+    if (el && f !== "months") el.value = ""; 
+  });
+  document.getElementById("months").value = "6";
+  prefillDefaultPaymentDate();
+  render();
+}
+function selectItem(id){ selectedId = id; render(); }
+function addPayment(){
+  const item = installments.find(x => x.id === selectedId);
+  const printBtn = document.getElementById("printBtn");
+  if (printBtn) printBtn.style.display = item ? "block" : "none";
+  if (!item) return;
+  const amount = Number(document.getElementById("payAmount").value || 0);
+  const date = document.getElementById("payDate").value || today();
+  const comment = document.getElementById("payComment").value || "Оплата";
+  if (!amount || amount <= 0) return alert("Укажи сумму оплаты.");
+  item.payments = item.payments || [];
+  item.payments.push({id: Date.now(), amount, paidAt: date, comment});
+  save();
+  render();
+}
+function quickNextPayment(){
+  const item = installments.find(x => x.id === selectedId);
+  const printBtn = document.getElementById("printBtn");
+  if (printBtn) printBtn.style.display = item ? "block" : "none";
+  if (!item) return;
+  const paid = totalPaid(item);
+  const next = plannedSchedule(item).find((p) => {
+    const required = Number(item.downPayment || 0) + plannedSchedule(item).filter(x => x.number <= p.number).reduce((s,x)=>s+Number(x.amount),0);
+    return paid < required;
+  });
+  if (!next) return alert("Рассрочка уже закрыта.");
+  document.getElementById("payAmount").value = next.amount;
+  document.getElementById("payDate").value = today();
+  document.getElementById("payComment").value = "Оплата";
+  addPayment();
+}
+function editPayment(paymentId){
+  const item = installments.find(x => x.id === selectedId);
+  const printBtn = document.getElementById("printBtn");
+  if (printBtn) printBtn.style.display = item ? "block" : "none";
+  const p = item?.payments?.find(x => x.id === paymentId);
+  if (!p) return;
+  const amount = prompt("Новая сумма оплаты:", p.amount);
+  if (amount === null) return;
+  const date = prompt("Новая дата оплаты (ГГГГ-ММ-ДД):", p.paidAt);
+  if (date === null) return;
+  const comment = prompt("Комментарий:", p.comment || "Оплата");
+  if (comment === null) return;
+  p.amount = Number(amount || 0);
+  p.paidAt = date;
+  p.comment = comment;
+  save();
+  render();
+}
+function deletePayment(paymentId){
+  const item = installments.find(x => x.id === selectedId);
+  const printBtn = document.getElementById("printBtn");
+  if (printBtn) printBtn.style.display = item ? "block" : "none";
+  if (!item || !confirm("Удалить эту оплату?")) return;
+  item.payments = (item.payments || []).filter(p => p.id !== paymentId);
+  save();
+  render();
+}
+function deleteItem(){
+  const item = installments.find(x => x.id === selectedId);
+  const printBtn = document.getElementById("printBtn");
+  if (printBtn) printBtn.style.display = item ? "block" : "none";
+  if (!item || !confirm("Удалить рассрочку: " + item.fullName + "?")) return;
+  installments = installments.filter(x => x.id !== selectedId);
+  selectedId = installments[0]?.id || null;
+  save();
+  render();
+}
+function render(){
+  const cloudEl = document.getElementById("cloudStatus");
+  if (cloudEl) cloudEl.textContent = cloudReady ? "Облако подключено: данные синхронизируются" : "Облако не подключено: данные временно сохраняются только в браузере";
+  const q = (document.getElementById("search")?.value || "").toLowerCase();
+  const list = installments.filter(x => [x.fullName,x.phone,x.product,x.model].join(" ").toLowerCase().includes(q));
+  document.getElementById("list").innerHTML = list.map(item => {
+    const s = status(item);
+    const cls = s === "Просрочка" ? "overdue" : s === "Закрыта" ? "closed" : "";
+    const selected = item.id === selectedId ? "selected-row" : "";
+    return `<tr class="${selected}" onclick="selectItem(${item.id})">
+      <td><b>${item.fullName}</b><br><span class="muted">${item.phone || ""}</span></td>
+      <td>${item.product}<br><span class="muted">Модель: ${item.model || "—"}</span></td>
+      <td><b>${rub(Number(item.totalPrice)-totalPaid(item))}</b></td>
+      <td><span class="status ${cls}">${s}</span></td>
+    </tr>`;
+  }).join("");
+
+  let dueToday = 0, overdue = 0, debt = 0, received = 0;
+  installments.forEach(item => {
+    debt += Math.max(0, Number(item.totalPrice) - totalPaid(item));
+    if (status(item) === "Просрочка") overdue++;
+    if (plannedSchedule(item).some(p => p.dueDate === today() && scheduleStatus(item,p) !== "Оплачен")) dueToday++;
+    (item.payments || []).forEach(p => { if (p.paidAt === today()) received += Number(p.amount); });
+  });
+  document.getElementById("dueToday").textContent = dueToday;
+  document.getElementById("overdueCount").textContent = overdue;
+  document.getElementById("receivedToday").textContent = rub(received);
+  document.getElementById("totalDebt").textContent = rub(debt);
+
+  const item = installments.find(x => x.id === selectedId);
+  const printBtn = document.getElementById("printBtn");
+  if (printBtn) printBtn.style.display = item ? "block" : "none";
+  const details = document.getElementById("details");
+  if (!item) {
+    details.innerHTML = "<h2 class='section-title'>Договор рассрочки</h2><p class='muted'>Выбери или добавь рассрочку.</p>";
+    return;
+  }
+
+  const planRowsForApp = plannedSchedule(item).map(p => {
+    const st = scheduleStatus(item,p);
+    return `<tr><td>${p.number}</td><td>${formatDate(p.dueDate)}</td><td>${rub(p.amount)}</td><td>${st}</td></tr>`;
+  }).join("");
+
+  const contractDateRows = plannedSchedule(item).map(p => `<tr><td>${p.number}</td><td>${formatDate(p.dueDate)}</td><td>${rub(p.amount)}</td></tr>`).join("");
+
+  const paymentRows = (item.payments || []).map(p => `<tr>
+    <td>${formatDate(p.paidAt)}</td>
+    <td>${rub(p.amount)}</td>
+    <td>${p.comment || ""}</td>
+    <td><button class="btn2" onclick="editPayment(${p.id})">Изменить</button> <button class="soft-danger" onclick="deletePayment(${p.id})">Отменить</button></td>
+  </tr>`).join("");
+
+  const remaining = Math.max(0, Number(item.totalPrice) - totalPaid(item));
+
+  details.innerHTML = `
+    <div class="no-print" style="display:flex;justify-content:space-between;gap:10px;align-items:start;">
+      <div><h2 class="section-title">Карточка рассрочки</h2><p class="muted">Выбран: <b>${item.fullName}</b></p></div>
+      
+    </div>
+
+    <div class="no-print">
+      <div class="two">
+        <div class="box"><b>Клиент</b><p>${item.fullName}</p><p>${item.phone || ""}</p><p>${item.address || ""}</p><p>Паспорт: ${item.passportNumber || "—"}<br>Кем выдан: ${item.passportIssued || "—"}<br>Дата выдачи: ${passportDateFormat(item.passportDate)}</p></div>
+        <div class="box"><b>Товар</b><p>${item.product}</p><p>Модель: ${item.model || "—"}</p><p>Стоимость: ${rub(item.totalPrice)}</p></div>
+      </div>
+      <div class="three">
+        <div class="box"><span class="muted">Первый взнос</span><br><b>${rub(item.downPayment)}</b></div>
+        <div class="box"><span class="muted">Оплачено дополнительно</span><br><b>${rub(sumPayments(item))}</b></div>
+        <div class="box"><span class="muted">Остаток</span><br><b>${rub(remaining)}</b></div>
+      </div>
+
+      <h3>График в приложении</h3>
+      <table><thead><tr><th>№</th><th>Дата</th><th>Сумма</th><th>Статус</th></tr></thead><tbody>${planRowsForApp}</tbody></table>
+
+      <h3>Принять оплату</h3>
+      <div class="three">
+        <input id="payAmount" type="number" placeholder="Сумма оплаты">
+        <input id="payDate" type="date" value="${today()}">
+        <input id="payComment" placeholder="Комментарий" value="Оплата">
+      </div>
+      <div class="two" style="margin-top:8px;"><button class="btn" onclick="addPayment()">Принять оплату</button><button class="btn2" onclick="quickNextPayment()">Оплатить следующий платёж</button></div>
+
+      <h3>История оплат</h3>
+      ${paymentRows ? `<table><thead><tr><th>Дата</th><th>Сумма</th><th>Комментарий</th><th>Действие</th></tr></thead><tbody>${paymentRows}</tbody></table>` : `<p class="muted">Пока оплат нет, кроме первого взноса.</p>`}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;"><button class="btn" id="printBtn" onclick="window.print()">Печать договора</button><button class="danger" onclick="deleteItem()">Удалить рассрочку</button></div>
+    </div>
+
+    <div class="contract-body">
+      <h1>ДОГОВОР РАССРОЧКИ</h1>
+      <p><b>№ договора:</b> ${item.id}</p>
+      <p><b>Магазин:</b> ТехноМир</p>
+      <p><b>Дата оформления:</b> ${formatDate(item.createdAt || today())}</p>
+
+      <h2>1. Стороны договора</h2>
+      <p>Магазин «ТехноМир», далее «Продавец», передаёт товар Покупателю на условиях рассрочки платежа.</p>
+      <p><b>Покупатель:</b> ${item.fullName}</p>
+      <p><b>Телефон:</b> ${item.phone || "—"}</p>
+      <p><b>Адрес:</b> ${item.address || "—"}</p>
+      <p><b>Паспорт:</b><br>Серия и номер: ${item.passportNumber || "—"}<br>Кем выдан: ${item.passportIssued || "—"}<br>Дата выдачи: ${passportDateFormat(item.passportDate)}</p>
+
+      <h2>2. Товар</h2>
+      <p><b>Наименование товара:</b> ${item.product}</p>
+      <p><b>Модель:</b> ${item.model || "—"}</p>
+      <p><b>Стоимость товара:</b> ${rub(item.totalPrice)}</p>
+
+      <h2>3. Условия оплаты</h2>
+      <p>Покупатель внёс первый взнос в размере <b>${rub(item.downPayment)}</b>.</p>
+      <p>Оставшаяся сумма к оплате составляет <b>${rub(Number(item.totalPrice) - Number(item.downPayment))}</b>.</p>
+      <p>Оставшаяся сумма делится равными ежемесячными платежами сроком на <b>${item.months}</b> мес.</p>
+
+      <h2>4. График дат оплат</h2>
+      <table><thead><tr><th>№</th><th>Дата оплаты</th><th>Сумма</th></tr></thead><tbody>${contractDateRows}</tbody></table>
+
+      <h2>5. Ответственность сторон</h2>
+      <p>Покупатель обязуется своевременно вносить платежи согласно установленному графику. В случае просрочки Покупатель обязан уведомить Продавца и согласовать новую дату оплаты.</p>
+      <p>До полной оплаты товара Покупатель подтверждает наличие задолженности перед Продавцом по настоящему договору.</p>
+
+      <h2>6. Подтверждение</h2>
+      <p>Покупатель подтверждает, что получил товар в исправном состоянии, ознакомлен с условиями рассрочки и обязуется выполнить оплату в полном объёме.</p>
+
+      <div class="signatures">
+        <div class="sign-line">Покупатель</div>
+        <div class="sign-line">Продавец</div>
+      </div>
+      <div class="copy-note">Договор печатается в двух экземплярах: один для Покупателя, один для Продавца.</div>
+    </div>
+  `;
+}
+checkLogin();
+prefillDefaultPaymentDate();
+render();
+</script>
+</div>
+</body>
+</html>
