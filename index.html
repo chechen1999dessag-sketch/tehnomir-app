@@ -24,9 +24,7 @@
     input, button { font: inherit; }
     input { width: 100%; padding: 11px; border: 1px solid #ddd; border-radius: 12px; background: white; }
     button { border: 0; border-radius: 14px; padding: 11px 14px; cursor: pointer; font-weight: 700; }
-    .btn {
-  transition: all 0.2s ease;
- background: #111; color: white; }
+    .btn { background: #111; color: white; }
     .btn2 { background: #eee; color: #111; }
     .danger { background: #b91c1c; color: white; }
     .soft-danger { background: #fee2e2; color: #991b1b; }
@@ -78,23 +76,60 @@
       .contract { padding: 0; }
     }
   
-.btn:active {
-  transform: scale(0.96);
-}
+    button {
+      transition: transform 0.12s ease, opacity 0.2s ease, background 0.2s ease;
+    }
+    button:active {
+      transform: scale(0.96);
+    }
+    button.loading {
+      opacity: 0.65;
+      pointer-events: none;
+    }
+    button.success {
+      background: #16a34a !important;
+      color: #fff !important;
+    }
+    .sync-message {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #166534;
+      font-weight: 700;
+    }
 
-.btn.loading {
-  opacity: 0.6;
-  pointer-events: none;
-}
+  
+    #toastContainer {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 9999;
+      display: grid;
+      gap: 8px;
+      max-width: 340px;
+    }
+    .toast {
+      background: #111;
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: 14px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.22);
+      font-size: 14px;
+      font-weight: 700;
+      animation: toastIn .18s ease-out;
+    }
+    .toast.success { background: #16a34a; }
+    .toast.error { background: #b91c1c; }
+    .toast.info { background: #111827; }
+    @keyframes toastIn {
+      from { transform: translateY(-10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
 
-.btn.success {
-  background: #16a34a !important;
-  color: #fff;
-}
-</style>
+  </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+<div id="toastContainer" class="no-print"></div>
 <div id="loginScreen" class="login-screen">
   <div class="login-card">
     <h1>ТехноМир</h1>
@@ -135,10 +170,11 @@
       <b>Синхронизация</b>
       <span id="lastSync" class="muted">Ещё не выполнялась</span>
       <div class="sync-actions">
-        <button class="btn" onclick="fullSync()">Синхронизировать</button>
+        <button id="syncMainBtn" class="btn" onclick="fullSync()">Синхронизировать</button>
         <button class="btn2" onclick="pullCloud()">Загрузить из облака</button>
         <button class="btn2" onclick="pushLocal()">Отправить в облако</button>
       </div>
+      <div id="syncMessage" class="sync-message"></div>
     </div>
   </div>
 
@@ -185,6 +221,21 @@
 </div>
 
 <script>
+function showToast(message, type = "success") {
+  const container = document.getElementById("toastContainer");
+  if (!container) return;
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-8px)";
+    toast.style.transition = "all .2s ease";
+  }, 2200);
+  setTimeout(() => toast.remove(), 2600);
+}
+
 const APP_PASSWORD = "y5cm2j9e";
 
 function login() {
@@ -199,8 +250,10 @@ function login() {
     document.getElementById("loginScreen").classList.add("hidden");
     document.getElementById("appScreen").classList.remove("hidden");
     render();
+    showToast("Вход выполнен", "success");
   } else {
     document.getElementById("loginError").textContent = "Неверный пароль";
+    showToast("Неверный пароль", "error");
   }
 }
 
@@ -288,6 +341,7 @@ async function pushLocal() {
   if (!ok) {
     syncInProgress = false;
     updateSyncUi("Облако недоступно. Работаем оффлайн.");
+    showToast("Облако недоступно", "error");
     return;
   }
 
@@ -321,9 +375,11 @@ async function pushLocal() {
     localStorage.setItem(LAST_SYNC_KEY, new Date().toLocaleString("ru-RU"));
     persistLocal();
     updateSyncUi("Локальные изменения отправлены в облако.");
+    showToast("Данные отправлены в облако", "success");
   } catch (e) {
     console.warn("Push error:", e);
     updateSyncUi("Ошибка отправки в облако.");
+    showToast("Ошибка отправки в облако", "error");
   } finally {
     syncInProgress = false;
     render();
@@ -339,6 +395,7 @@ async function pullCloud() {
   if (!ok) {
     syncInProgress = false;
     updateSyncUi("Облако недоступно. Работаем оффлайн.");
+    showToast("Облако недоступно", "error");
     return;
   }
 
@@ -377,9 +434,11 @@ async function pullCloud() {
     localStorage.setItem(LAST_SYNC_KEY, new Date().toLocaleString("ru-RU"));
     persistLocal();
     updateSyncUi("Данные загружены из облака.");
+    showToast("Данные загружены из облака", "success");
   } catch (e) {
     console.warn("Pull error:", e);
     updateSyncUi("Ошибка загрузки из облака.");
+    showToast("Ошибка загрузки из облака", "error");
   } finally {
     syncInProgress = false;
     render();
@@ -387,28 +446,33 @@ async function pullCloud() {
 }
 
 async function fullSync() {
-  const btn = document.querySelector('button[onclick="fullSync()"]');
-  const originalText = btn ? btn.innerText : "";
+  const btn = document.getElementById("syncMainBtn") || document.querySelector('button[onclick="fullSync()"]');
+  const msg = document.getElementById("syncMessage");
+  const originalText = btn ? btn.textContent : "Синхронизировать";
 
   if (btn) {
     btn.classList.add("loading");
-    btn.innerText = "Синхронизация...";
+    btn.textContent = "Синхронизация...";
   }
+  if (msg) msg.textContent = "Идёт синхронизация...";
 
   await pushLocal();
   await pullCloud();
 
   if (btn) {
-    btn.innerText = "Готово ✓";
     btn.classList.remove("loading");
     btn.classList.add("success");
-
-    setTimeout(() => {
-      btn.classList.remove("success");
-      btn.innerText = originalText;
-    }, 1500);
+    btn.textContent = "Готово ✓";
   }
+  if (msg) msg.textContent = "Синхронизация завершена ✓";
 
+  setTimeout(() => {
+    if (btn) {
+      btn.classList.remove("success");
+      btn.textContent = originalText;
+    }
+    if (msg) msg.textContent = "";
+  }, 1800);
 }
 
 async function save({ silent = false } = {}) {
@@ -498,6 +562,7 @@ function addInstallment(){
   document.getElementById("months").value = "6";
   prefillDefaultPaymentDate();
   render();
+  showToast("Рассрочка добавлена", "success");
 }
 function selectItem(id){ selectedId = id; render(); }
 function addPayment(){
@@ -515,6 +580,7 @@ function addPayment(){
   queueChange("upsert", item);
   save();
   render();
+  showToast("Оплата сохранена", "success");
 }
 function quickNextPayment(){
   const item = installments.find(x => x.id === selectedId);
@@ -551,6 +617,7 @@ function editPayment(paymentId){
   queueChange("upsert", item);
   save();
   render();
+  showToast("Оплата изменена", "success");
 }
 function deletePayment(paymentId){
   const item = installments.find(x => x.id === selectedId);
@@ -562,6 +629,7 @@ function deletePayment(paymentId){
   queueChange("upsert", item);
   save();
   render();
+  showToast("Оплата отменена", "info");
 }
 function deleteItem(){
   const item = installments.find(x => x.id === selectedId);
@@ -574,6 +642,7 @@ function deleteItem(){
   selectedId = installments[0]?.id || null;
   save();
   render();
+  showToast("Рассрочка удалена", "info");
 }
 function render(){
   const cloudEl = document.getElementById("cloudStatus");
@@ -659,7 +728,7 @@ function render(){
 
       <h3>История оплат</h3>
       ${paymentRows ? `<table><thead><tr><th>Дата</th><th>Сумма</th><th>Комментарий</th><th>Действие</th></tr></thead><tbody>${paymentRows}</tbody></table>` : `<p class="muted">Пока оплат нет, кроме первого взноса.</p>`}
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;"><button class="btn" id="printBtn" onclick="window.print()">Печать договора</button><button class="danger" onclick="deleteItem()">Удалить рассрочку</button></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;"><button class="btn" id="printBtn" onclick="showToast('Открывается печать договора', 'info'); setTimeout(() => window.print(), 250)">Печать договора</button><button class="danger" onclick="deleteItem()">Удалить рассрочку</button></div>
     </div>
 
     <div class="contract-body">
@@ -706,6 +775,13 @@ function render(){
 checkLogin();
 prefillDefaultPaymentDate();
 render();
+
+document.addEventListener("click", (event) => {
+  const btn = event.target.closest("button");
+  if (!btn) return;
+  btn.style.transform = "scale(0.96)";
+  setTimeout(() => btn.style.transform = "", 120);
+});
 </script>
 </div>
 </body>
