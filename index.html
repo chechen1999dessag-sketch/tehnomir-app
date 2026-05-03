@@ -983,7 +983,7 @@
   <div class="header no-print">
     <div>
       <h1>Рассрочка ТехноМир</h1>
-      <p>Клиенты, оплаты, договор, печать и облачное хранение · v26</p><p id="cloudStatus" style="margin-top:4px;color:#aaa;font-size:13px;">Подключение к облаку...</p>
+      <p>Клиенты, оплаты, договор, печать и облачное хранение · v27</p><p id="cloudStatus" style="margin-top:4px;color:#aaa;font-size:13px;">Подключение к облаку...</p>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
       <button class="btn2 theme-toggle" id="themeToggleBtn" onclick="toggleTheme()"><span class="btn-icon">🌙</span><span>Тёмный режим</span></button>
@@ -1665,17 +1665,53 @@ function status(item){
   return "Активная";
 }
 
-function getClientKey(item) {
-  const phoneDigits = digitsOnly(item?.phone || "");
-  if (phoneDigits) return "phone:" + phoneDigits;
-  return "name:" + String(item?.fullName || "").trim().toLowerCase();
+function normalizeClientPhone(value) {
+  let digits = digitsOnly(value || "");
+  if (!digits) return "";
+  if (digits[0] === "7") digits = "8" + digits.slice(1);
+  if (digits[0] !== "8" && digits.length === 10) digits = "8" + digits;
+  return digits;
+}
+
+function normalizeClientName(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/ё/g, "е")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function normalizePassport(value) {
+  return digitsOnly(value || "");
+}
+
+function isSameClient(a, b) {
+  if (!a || !b) return false;
+
+  const aPhone = normalizeClientPhone(a.phone);
+  const bPhone = normalizeClientPhone(b.phone);
+
+  const aPassport = normalizePassport(a.passportNumber);
+  const bPassport = normalizePassport(b.passportNumber);
+
+  const aName = normalizeClientName(a.fullName);
+  const bName = normalizeClientName(b.fullName);
+
+  // Самые надёжные совпадения: телефон и паспорт.
+  if (aPhone && bPhone && aPhone === bPhone) return true;
+  if (aPassport && bPassport && aPassport === bPassport) return true;
+
+  // Если телефон/паспорт в старом договоре отличался или был введён иначе,
+  // группируем по одинаковому ФИО.
+  if (aName && bName && aName === bName) return true;
+
+  return false;
 }
 
 function clientContracts(item) {
   if (!item) return [];
-  const key = getClientKey(item);
   return installments
-    .filter(x => getClientKey(x) === key)
+    .filter(x => isSameClient(x, item))
     .sort((a, b) => Number(b.id) - Number(a.id));
 }
 
