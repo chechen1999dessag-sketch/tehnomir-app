@@ -963,6 +963,19 @@
       background: rgba(15, 33, 54, .96) !important;
     }
 
+
+    .client-repeat-btn {
+      background: linear-gradient(135deg, #eef6ff 0%, #dcecff 100%) !important;
+      color: #24466f !important;
+      border: 1px solid rgba(58, 108, 180, .18) !important;
+      font-weight: 800;
+    }
+    body.dark-theme .client-repeat-btn {
+      background: linear-gradient(135deg, #274a77 0%, #3668a4 100%) !important;
+      color: #fff !important;
+      border-color: rgba(169, 201, 245, .18) !important;
+    }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -983,7 +996,7 @@
   <div class="header no-print">
     <div>
       <h1>Рассрочка ТехноМир</h1>
-      <p>Клиенты, оплаты, договор, печать и облачное хранение · v28</p><p id="cloudStatus" style="margin-top:4px;color:#aaa;font-size:13px;">Подключение к облаку...</p>
+      <p>Клиенты, оплаты, договор, печать и облачное хранение</p><p id="cloudStatus" style="margin-top:4px;color:#aaa;font-size:13px;">Подключение к облаку...</p>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
       <button class="btn2 theme-toggle" id="themeToggleBtn" onclick="toggleTheme()"><span class="btn-icon">🌙</span><span>Тёмный режим</span></button>
@@ -2066,7 +2079,6 @@ function render(){
   details.innerHTML = `
     <div class="no-print" style="display:flex;justify-content:space-between;gap:10px;align-items:start;">
       <div><h2 class="section-title"><span class="section-icon">📄</span>Карточка рассрочки</h2><p class="muted">Выбран: <b>${item.fullName}</b></p><p><span class="mini-badge ${clientTrust(item).cls}">${clientTrust(item).label}</span></p></div>
-      
     </div>
 
     <div class="no-print">
@@ -2081,7 +2093,10 @@ function render(){
       </div>
 
       <div class="client-history">
-        <h3><span class="section-icon small">🗂️</span>История клиента</h3>
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
+          <h3 style="margin:0;"><span class="section-icon small">🗂️</span>История клиента</h3>
+          <button class="btn2 client-repeat-btn" onclick="fillNewInstallmentForClient(${item.id})"><span class="btn-icon">➕</span><span>Новая рассрочка этому клиенту</span></button>
+        </div>
         <div class="two">
           <div class="box"><span class="muted">Договоров клиента</span><br><b>${sameClientContracts.length}</b></div>
           <div class="box"><span class="muted">Общая сумма покупок</span><br><b>${rub(totalClientPurchases(item))}</b></div>
