@@ -920,6 +920,13 @@
       background: linear-gradient(135deg, #31588e 0%, #4778bb 100%) !important;
     }
 
+
+    #syncMainBtn.loading {
+      opacity: .72;
+      cursor: wait;
+      animation: softPulse 1.1s ease-in-out infinite;
+    }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -940,7 +947,7 @@
   <div class="header no-print">
     <div>
       <h1>Рассрочка ТехноМир</h1>
-      <p>Клиенты, оплаты, договор, печать и облачное хранение</p><p id="cloudStatus" style="margin-top:4px;color:#aaa;font-size:13px;">Подключение к облаку...</p>
+      <p>Клиенты, оплаты, договор, печать и облачное хранение · v23</p><p id="cloudStatus" style="margin-top:4px;color:#aaa;font-size:13px;">Подключение к облаку...</p>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
       <button class="btn2 theme-toggle" id="themeToggleBtn" onclick="toggleTheme()"><span class="btn-icon">🌙</span><span>Тёмный режим</span></button>
@@ -1001,9 +1008,9 @@
         <h2 class="section-title">Добавить рассрочку</h2>
         <div class="formgrid">
           <input id="fullName" placeholder="ФИО клиента">
-          <input id="phone" placeholder="Телефон" inputmode="tel" title="Введи цифры, например 89380866451 — формат поставится автоматически">
+          <input id="phone" placeholder="Телефон" inputmode="tel" oninput="this.value=formatPhoneNumber(this.value); updateMaskWarnings();" title="Введи цифры, например 89380866451 — формат поставится автоматически">
           <input id="address" placeholder="Адрес">
-          <input id="passportNumber" placeholder="Серия и номер паспорта" inputmode="numeric" title="Введи 10 цифр, например 9613257213 — пробелы поставятся автоматически">
+          <input id="passportNumber" placeholder="Серия и номер паспорта" inputmode="numeric" oninput="this.value=formatPassportNumber(this.value); updateMaskWarnings();" title="Введи 10 цифр, например 9613257213 — пробелы поставятся автоматически">
           <input id="passportIssued" placeholder="Кем выдан">
           <input id="passportDate" type="date">
           <input id="product" placeholder="Товар">
@@ -1094,9 +1101,11 @@ function formatPhoneNumber(value) {
   let digits = digitsOnly(value);
   if (!digits) return "";
 
-  // Если пользователь начал с 9, автоматически добавляем 8.
+  // 8938... => 8 (938)...
+  // 7938... => 8 (938)...
+  // 938...  => 8 (938)...
   if (digits[0] === "7") digits = "8" + digits.slice(1);
-  if (digits[0] !== "8" && digits.length <= 10) digits = "8" + digits;
+  if (digits[0] !== "8") digits = "8" + digits;
 
   const main = digits.slice(0, 11);
   const extra = digits.slice(11);
@@ -1108,7 +1117,7 @@ function formatPhoneNumber(value) {
   if (main.length > 7) result += "-" + main.slice(7, 9);
   if (main.length > 9) result += "-" + main.slice(9, 11);
 
-  // Лишние цифры оставляем видимыми в конце.
+  // Лишние цифры показываем в конце, не скрываем.
   return extra ? `${result} ${extra}` : result;
 }
 
@@ -1369,6 +1378,7 @@ async function testCloud() {
     cloudReady = false;
   }
   updateSyncUi();
+  render();
   return cloudReady;
 }
 
@@ -1488,12 +1498,8 @@ async function pullCloud() {
 async function fullSync() {
   const btn = document.getElementById("syncMainBtn") || document.querySelector('button[onclick="fullSync()"]');
   const msg = document.getElementById("syncMessage");
-  const originalHtml = btn ? btn.innerHTML : '<span class="btn-icon">🔄</span><span>Синхронизировать</span>';
 
-  if (btn) {
-    btn.classList.add("loading");
-    btn.innerHTML = '<span class="btn-icon">🔄</span><span>Синхронизация...</span>';
-  }
+  if (btn) btn.classList.add("loading");
   if (msg) msg.textContent = "Идёт синхронизация...";
 
   Promise.resolve()
@@ -1509,13 +1515,10 @@ async function fullSync() {
       if (msg) msg.textContent = "Ошибка синхронизации";
     })
     .finally(() => {
-      if (btn) {
-        btn.classList.remove("loading", "success");
-        btn.innerHTML = originalHtml;
-      }
+      if (btn) btn.classList.remove("loading", "success");
       setTimeout(() => {
         if (msg) msg.textContent = "";
-      }, 1600);
+      }, 1300);
       render();
     });
 }
@@ -1784,7 +1787,9 @@ function render(){
   const q = (document.getElementById("search")?.value || "").toLowerCase();
   const list = filteredInstallments(q);
   updateFilterButtons();
-  document.getElementById("list").innerHTML = list.map(item => {
+  const listEl = document.getElementById("list");
+  if (!listEl) return;
+  listEl.innerHTML = list.map(item => {
     const s = status(item);
     const cls = s === "Просрочка" ? "overdue" : s === "Закрыта" ? "closed" : "";
     const selected = item.id === selectedId ? "selected-row" : "";
@@ -1936,6 +1941,8 @@ function render(){
 function startupApp() {
   initTheme();
   checkLogin();
+  listFilter = "all";
+
   prefillDefaultPaymentDate();
   bindPassportFormatter();
   bindPhoneFormatter();
@@ -1948,15 +1955,26 @@ function startupApp() {
 
   render();
 
-  // На некоторых браузерах GitHub Pages/кэш отрисовывает страницу раньше данных.
-  // Повторный рендер убирает ситуацию, когда список пустой до нажатия фильтра.
+  // Повторно подключаем маски после полной отрисовки браузера.
   setTimeout(() => {
     bindPassportFormatter();
     bindPhoneFormatter();
     updateMaskWarnings();
     updateFilterButtons();
     render();
-  }, 120);
+  }, 150);
+
+  // Если локально пусто или страница только открылась, подтягиваем облако автоматически.
+  // Это не заменяет ручную синхронизацию: кнопка остаётся для отправки/приёма изменений.
+  setTimeout(async () => {
+    if (!cloudReady) await testCloud();
+    if (cloudReady && pendingChanges.length === 0) {
+      await pullCloud();
+      listFilter = "all";
+      updateFilterButtons();
+      render();
+    }
+  }, 450);
 }
 
 startupApp();
