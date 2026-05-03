@@ -125,6 +125,239 @@
       to { transform: translateY(0); opacity: 1; }
     }
 
+  
+    :root {
+      --bg: #f4f7fb;
+      --card: rgba(255,255,255,.94);
+      --text: #162033;
+      --muted: #667085;
+      --primary: #1f2937;
+      --primary-hover: #111827;
+      --soft: #eef2f7;
+      --border: #e5eaf1;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --warning: #f59e0b;
+      --blue: #2563eb;
+    }
+
+    body {
+      background: linear-gradient(180deg, #edf3f8 0%, #f8fafc 100%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Arial, sans-serif;
+      letter-spacing: -0.01em;
+    }
+
+    .wrap {
+      max-width: 1280px;
+      padding: 18px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #111827 0%, #26364d 100%);
+      border-radius: 28px;
+      padding: 24px 28px;
+      box-shadow: 0 16px 38px rgba(17, 24, 39, .16);
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .header p {
+      color: #d1d5db;
+    }
+
+    .card,
+    .sync-box {
+      background: var(--card);
+      border: 1px solid rgba(226,232,240,.95);
+      border-radius: 24px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
+      backdrop-filter: blur(8px);
+    }
+
+    .stat-title,
+    .muted {
+      color: var(--muted);
+    }
+
+    .stat-value {
+      color: #111827;
+      font-size: 28px;
+      letter-spacing: -0.03em;
+    }
+
+    input {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px 13px;
+      outline: none;
+      transition: border .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+
+    input:focus {
+      background: #fff;
+      border-color: #94a3b8;
+      box-shadow: 0 0 0 4px rgba(148, 163, 184, .16);
+    }
+
+    button {
+      border-radius: 14px;
+      transition: transform .12s ease, opacity .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+
+    button:active {
+      transform: scale(.97);
+    }
+
+    button.loading {
+      opacity: .65;
+      pointer-events: none;
+    }
+
+    button.success {
+      background: var(--success) !important;
+      color: white !important;
+    }
+
+    .btn {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 6px 14px rgba(31, 41, 55, .16);
+    }
+
+    .btn:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn2 {
+      background: var(--soft);
+      color: #1f2937;
+      border: 1px solid #e2e8f0;
+    }
+
+    .btn2:hover {
+      background: #e5eaf1;
+    }
+
+    .danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    table {
+      border-spacing: 0;
+      overflow: hidden;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #64748b;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #eef2f7;
+    }
+
+    tbody tr {
+      transition: background .15s ease, color .15s ease, box-shadow .15s ease;
+    }
+
+    tbody tr:hover {
+      background: #f1f5f9 !important;
+    }
+
+    .selected-row {
+      background: #dbeafe !important;
+      color: #0f172a !important;
+      box-shadow: inset 4px 0 0 var(--blue);
+    }
+
+    .selected-row .muted {
+      color: #475569;
+    }
+
+    .status {
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+
+    .overdue {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .closed {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .box {
+      background: #f8fafc;
+      border: 1px solid #eef2f7;
+      border-radius: 18px;
+    }
+
+    .sync-panel {
+      margin: 16px 0;
+    }
+
+    .sync-box {
+      padding: 16px;
+    }
+
+    .sync-message {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #166534;
+      font-weight: 700;
+    }
+
+    #toastContainer {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 9999;
+      display: grid;
+      gap: 8px;
+      max-width: 340px;
+    }
+
+    .toast {
+      background: #111827;
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, .22);
+      font-size: 14px;
+      font-weight: 700;
+      animation: toastIn .18s ease-out;
+    }
+
+    .toast.success { background: #16a34a; }
+    .toast.error { background: #dc2626; }
+    .toast.info { background: #1f2937; }
+
+    @keyframes toastIn {
+      from { transform: translateY(-10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @media print {
+      body { background: white !important; }
+      .card, .sync-box { box-shadow: none !important; border: 0 !important; }
+    }
+
   </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -170,6 +403,8 @@
       <b>Синхронизация</b>
       <span id="lastSync" class="muted">Ещё не выполнялась</span>
       <div class="sync-actions">
+        <button class="btn2" onclick="exportData()">Скачать резерв</button>
+        <button class="btn2" onclick="importData()">Восстановить</button>
         <button id="syncMainBtn" class="btn" onclick="fullSync()">Синхронизировать</button>
         <button class="btn2" onclick="pullCloud()">Загрузить из облака</button>
         <button class="btn2" onclick="pushLocal()">Отправить в облако</button>
@@ -221,6 +456,34 @@
 </div>
 
 <script>
+function exportData() {
+  const data = localStorage.getItem("tehnomir_installments_cloud_backup") || "[]";
+  const blob = new Blob([data], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "backup_tehnomir.json";
+  a.click();
+  showToast("Резерв сохранён", "success");
+}
+
+function importData() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "application/json";
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      localStorage.setItem("tehnomir_installments_cloud_backup", reader.result);
+      showToast("База восстановлена", "success");
+      setTimeout(() => location.reload(), 700);
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
 function showToast(message, type = "success") {
   const container = document.getElementById("toastContainer");
   if (!container) return;
@@ -653,7 +916,8 @@ function render(){
     const s = status(item);
     const cls = s === "Просрочка" ? "overdue" : s === "Закрыта" ? "closed" : "";
     const selected = item.id === selectedId ? "selected-row" : "";
-    return `<tr class="${selected}" onclick="selectItem(${item.id})">
+    const rowTint = s === "Просрочка" ? "background:#fff1f2;" : s === "Закрыта" ? "background:#f0fdf4;" : "";
+    return `<tr class="${selected}" style="${rowTint}" onclick="selectItem(${item.id})">
       <td><b>${item.fullName}</b><br><span class="muted">${item.phone || ""}</span></td>
       <td>${item.product}<br><span class="muted">Модель: ${item.model || "—"}</span></td>
       <td><b>${rub(Number(item.totalPrice)-totalPaid(item))}</b></td>
