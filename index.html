@@ -911,6 +911,15 @@
       }
     }
 
+
+    button.loading {
+      cursor: wait;
+      opacity: .78;
+    }
+    #syncMainBtn.loading {
+      background: linear-gradient(135deg, #31588e 0%, #4778bb 100%) !important;
+    }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -992,9 +1001,9 @@
         <h2 class="section-title">Добавить рассрочку</h2>
         <div class="formgrid">
           <input id="fullName" placeholder="ФИО клиента">
-          <input id="phone" placeholder="Телефон" inputmode="tel" title="Номер форматируется автоматически: 8 (938) 086-64-51">
+          <input id="phone" placeholder="Телефон" inputmode="tel" title="Введи цифры, например 89380866451 — формат поставится автоматически">
           <input id="address" placeholder="Адрес">
-          <input id="passportNumber" placeholder="Серия и номер паспорта" inputmode="numeric" title="Форматируется автоматически: 96 13 257213">
+          <input id="passportNumber" placeholder="Серия и номер паспорта" inputmode="numeric" title="Введи 10 цифр, например 9613257213 — пробелы поставятся автоматически">
           <input id="passportIssued" placeholder="Кем выдан">
           <input id="passportDate" type="date">
           <input id="product" placeholder="Товар">
@@ -1479,31 +1488,36 @@ async function pullCloud() {
 async function fullSync() {
   const btn = document.getElementById("syncMainBtn") || document.querySelector('button[onclick="fullSync()"]');
   const msg = document.getElementById("syncMessage");
-  const originalText = btn ? btn.textContent : "Синхронизировать";
+  const originalHtml = btn ? btn.innerHTML : '<span class="btn-icon">🔄</span><span>Синхронизировать</span>';
 
   if (btn) {
     btn.classList.add("loading");
-    btn.textContent = "Синхронизация...";
+    btn.innerHTML = '<span class="btn-icon">🔄</span><span>Синхронизация...</span>';
   }
   if (msg) msg.textContent = "Идёт синхронизация...";
 
-  await pushLocal();
-  await pullCloud();
-
-  if (btn) {
-    btn.classList.remove("loading");
-    btn.classList.add("success");
-    btn.textContent = "Готово ✓";
-  }
-  if (msg) msg.textContent = "Синхронизация завершена ✓";
-
-  setTimeout(() => {
-    if (btn) {
-      btn.classList.remove("success");
-      btn.textContent = originalText;
-    }
-    if (msg) msg.textContent = "";
-  }, 1800);
+  Promise.resolve()
+    .then(() => pushLocal())
+    .then(() => pullCloud())
+    .then(() => {
+      showToast("Синхронизация завершена", "success");
+      if (msg) msg.textContent = "Синхронизация завершена";
+    })
+    .catch((e) => {
+      console.warn("Full sync error:", e);
+      showToast("Ошибка синхронизации", "error");
+      if (msg) msg.textContent = "Ошибка синхронизации";
+    })
+    .finally(() => {
+      if (btn) {
+        btn.classList.remove("loading", "success");
+        btn.innerHTML = originalHtml;
+      }
+      setTimeout(() => {
+        if (msg) msg.textContent = "";
+      }, 1600);
+      render();
+    });
 }
 
 async function save({ silent = false } = {}) {
@@ -1677,6 +1691,9 @@ function addInstallment(){
   document.getElementById("months").value = "6";
   updateMaskWarnings();
   prefillDefaultPaymentDate();
+  bindPassportFormatter();
+  bindPhoneFormatter();
+  updateMaskWarnings();
   render();
   showToast("Рассрочка добавлена", "success");
 }
@@ -1760,6 +1777,8 @@ function deleteItem(){
   showToast("Рассрочка удалена", "info");
 }
 function render(){
+  if (!["all","active","overdue","dueToday","closed"].includes(listFilter)) listFilter = "all";
+  if (installments.length && !installments.some(x => String(x.id) === String(selectedId))) selectedId = installments[0].id;
   const cloudEl = document.getElementById("cloudStatus");
   if (cloudEl) cloudEl.textContent = cloudReady ? "Облако подключено: данные синхронизируются" : "Облако не подключено: данные временно сохраняются только в браузере";
   const q = (document.getElementById("search")?.value || "").toLowerCase();
@@ -1914,9 +1933,33 @@ function render(){
   `;
   attachRippleEffects(details);
 }
-checkLogin();
-prefillDefaultPaymentDate();
-render();
+function startupApp() {
+  initTheme();
+  checkLogin();
+  prefillDefaultPaymentDate();
+  bindPassportFormatter();
+  bindPhoneFormatter();
+  updateMaskWarnings();
+  updateFilterButtons();
+
+  if (installments.length && !installments.some(x => String(x.id) === String(selectedId))) {
+    selectedId = installments[0].id;
+  }
+
+  render();
+
+  // На некоторых браузерах GitHub Pages/кэш отрисовывает страницу раньше данных.
+  // Повторный рендер убирает ситуацию, когда список пустой до нажатия фильтра.
+  setTimeout(() => {
+    bindPassportFormatter();
+    bindPhoneFormatter();
+    updateMaskWarnings();
+    updateFilterButtons();
+    render();
+  }, 120);
+}
+
+startupApp();
 
 function attachRippleEffects(root = document) {
   root.querySelectorAll("button").forEach(btn => {
