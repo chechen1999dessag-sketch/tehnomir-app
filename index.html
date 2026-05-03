@@ -551,7 +551,183 @@
       }
     }
 
-  </style>
+  
+
+    html { scroll-behavior: smooth; }
+    body { min-height: 100vh; transition: background .35s ease, color .25s ease; }
+    body {
+      background:
+        radial-gradient(circle at top left, rgba(51,89,145,.14), transparent 30%),
+        radial-gradient(circle at top right, rgba(21,44,78,.12), transparent 28%),
+        linear-gradient(180deg, #dbe5f0 0%, #eaf1f8 100%);
+    }
+    .dark-theme body, body.dark-theme {
+      background:
+        radial-gradient(circle at top left, rgba(59,130,246,.12), transparent 24%),
+        radial-gradient(circle at top right, rgba(147,197,253,.08), transparent 22%),
+        linear-gradient(180deg, #0f172a 0%, #111827 55%, #0b1220 100%);
+    }
+    .header {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 20px 55px rgba(15, 23, 42, .24);
+      animation: fadeUp .45s ease both;
+    }
+    .header::after {
+      content: "";
+      position: absolute;
+      inset: auto -20% -60% auto;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(255,255,255,.16), transparent 60%);
+      animation: floatGlow 7s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .grid4 .card, .sync-box, .layout > .card, #details .box, #details .three .box {
+      animation: fadeUp .5s ease both;
+    }
+    .grid4 .card:nth-child(1) { animation-delay: .05s; }
+    .grid4 .card:nth-child(2) { animation-delay: .1s; }
+    .grid4 .card:nth-child(3) { animation-delay: .15s; }
+    .grid4 .card:nth-child(4) { animation-delay: .2s; }
+    .sync-box:nth-child(1) { animation-delay: .25s; }
+    .sync-box:nth-child(2) { animation-delay: .3s; }
+    .sync-box:nth-child(3) { animation-delay: .35s; }
+    .card, .sync-box, .box, tbody tr, input, button {
+      transition: transform .18s ease, box-shadow .22s ease, background .22s ease, border-color .22s ease, color .22s ease, opacity .22s ease;
+    }
+    .card:hover, .sync-box:hover, .box:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 34px rgba(15,23,42,.10);
+    }
+    tbody tr:hover { transform: translateY(-1px); }
+    .selected-row {
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+      animation: selectedPulse 2s ease-in-out infinite;
+    }
+    input:focus {
+      outline: none;
+      border-color: #4f74c8;
+      box-shadow: 0 0 0 4px rgba(79,116,200,.12);
+      transform: translateY(-1px);
+    }
+    button {
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 6px 16px rgba(17,24,39,.06);
+    }
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(17,24,39,.12);
+    }
+    button.clicked { transform: scale(.97); }
+    .accent {
+      background: linear-gradient(135deg, #23406d 0%, #355c9a 100%);
+      color: #fff;
+    }
+    .accent:hover { filter: brightness(1.03); }
+    .pulse-btn { animation: softPulse 2.2s ease-in-out infinite; }
+    .btn-icon, .stat-icon, .section-icon { display: inline-flex; align-items: center; justify-content: center; }
+    .btn-icon { font-size: 15px; line-height: 1; }
+    .stat-icon {
+      width: 24px; height: 24px; border-radius: 8px;
+      background: rgba(53,92,154,.12); margin-right: 8px; font-size: 13px;
+      vertical-align: middle;
+    }
+    .stat-title { display: flex; align-items: center; }
+    .section-icon { margin-right: 8px; }
+    .section-icon.small { font-size: 16px; }
+    .theme-toggle { min-width: 172px; }
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      backdrop-filter: blur(6px);
+    }
+    .toast-icon {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,.15);
+      font-size: 12px;
+      flex: 0 0 22px;
+    }
+    .toast.toast-out { opacity: 0; transform: translateY(-8px) scale(.98); transition: all .22s ease; }
+    .filter-row { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      background: #eef3fb;
+      border: 1px solid #d7e1f0;
+      color: #294061;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: none;
+    }
+    .chip.active { background: linear-gradient(135deg, #23406d 0%, #355c9a 100%); color: #fff; border-color: transparent; }
+    .ripple {
+      position: absolute;
+      width: 10px; height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.35);
+      transform: translate(-50%, -50%) scale(0);
+      pointer-events: none;
+      animation: rippleExpand .5s ease-out forwards;
+    }
+    @keyframes rippleExpand {
+      to { transform: translate(-50%, -50%) scale(14); opacity: 0; }
+    }
+    @keyframes floatGlow {
+      0%,100% { transform: translateY(0); opacity:.75; }
+      50% { transform: translateY(-14px); opacity:1; }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes softPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(53,92,154,.14), 0 8px 18px rgba(17,24,39,.12); }
+      50% { box-shadow: 0 0 0 8px rgba(53,92,154,0), 0 12px 22px rgba(17,24,39,.18); }
+    }
+    @keyframes selectedPulse {
+      0%,100% { filter: brightness(1); }
+      50% { filter: brightness(1.04); }
+    }
+    .dark-theme .header, body.dark-theme .header {
+      background: linear-gradient(135deg, #0f172a 0%, #18314f 100%);
+      border-color: rgba(148, 163, 184, .12);
+    }
+    .dark-theme .card, .dark-theme .sync-box, .dark-theme .box,
+    body.dark-theme .card, body.dark-theme .sync-box, body.dark-theme .box {
+      background: rgba(15, 23, 42, .88);
+      border: 1px solid rgba(148, 163, 184, .12);
+      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+    }
+    .dark-theme input, body.dark-theme input {
+      background: rgba(15, 23, 42, .82);
+      color: #e5edf8;
+      border-color: rgba(148, 163, 184, .18);
+    }
+    .dark-theme .btn2, .dark-theme .chip, .dark-theme .soft-danger,
+    body.dark-theme .btn2, body.dark-theme .chip, body.dark-theme .soft-danger {
+      background: rgba(148, 163, 184, .12);
+      color: #e2e8f0;
+      border-color: rgba(148, 163, 184, .12);
+    }
+    .dark-theme .stat-icon, body.dark-theme .stat-icon { background: rgba(96, 165, 250, .18); }
+    .dark-theme .chip.active, body.dark-theme .chip.active { background: linear-gradient(135deg, #31558a 0%, #4d76b5 100%); }
+    .dark-theme .selected-row, body.dark-theme .selected-row { background: linear-gradient(135deg, #1e3a5f, #27436e) !important; }
+    .dark-theme table th, .dark-theme table td, body.dark-theme table th, body.dark-theme table td { border-bottom-color: rgba(148,163,184,.10); }
+    .dark-theme .muted, body.dark-theme .muted { color: #94a3b8; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+
+</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -574,36 +750,36 @@
       <p>Клиенты, оплаты, договор, печать и облачное хранение</p><p id="cloudStatus" style="margin-top:4px;color:#aaa;font-size:13px;">Подключение к облаку...</p>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn2 theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">🌙 Тёмный режим</button>
-      <button class="btn2" onclick="logout()">Выйти</button>
+      <button class="btn2 theme-toggle" id="themeToggleBtn" onclick="toggleTheme()"><span class="btn-icon">🌙</span><span>Тёмный режим</span></button>
+      <button class="btn2" onclick="logout()"><span class="btn-icon">↩</span><span>Выйти</span></button>
     </div>
   </div>
 
   <div class="grid4 no-print">
-    <div class="card"><div class="stat-title">Сегодня к оплате</div><div id="dueToday" class="stat-value">0</div></div>
-    <div class="card"><div class="stat-title">Просрочки</div><div id="overdueCount" class="stat-value">0</div></div>
-    <div class="card"><div class="stat-title">Поступило сегодня</div><div id="receivedToday" class="stat-value">0 ₽</div></div>
-    <div class="card"><div class="stat-title">Общий долг</div><div id="totalDebt" class="stat-value">0 ₽</div></div>
+    <div class="card"><div class="stat-title"><span class="stat-icon">💳</span>Сегодня к оплате</div><div id="dueToday" class="stat-value">0</div></div>
+    <div class="card"><div class="stat-title"><span class="stat-icon">⚠️</span>Просрочки</div><div id="overdueCount" class="stat-value">0</div></div>
+    <div class="card"><div class="stat-title"><span class="stat-icon">📥</span>Поступило сегодня</div><div id="receivedToday" class="stat-value">0 ₽</div></div>
+    <div class="card"><div class="stat-title"><span class="stat-icon">📊</span>Общий долг</div><div id="totalDebt" class="stat-value">0 ₽</div></div>
   </div>
 
   <div class="sync-panel no-print">
     <div class="sync-box">
-      <b>Режим работы</b>
+      <b>🖥️ Режим работы</b>
       <span id="workMode" class="muted">Проверка...</span>
     </div>
     <div class="sync-box">
-      <b>Очередь изменений</b>
+      <b>📝 Очередь изменений</b>
       <span id="pendingCount" class="muted">0 изменений</span>
     </div>
     <div class="sync-box">
-      <b>Синхронизация</b>
+      <b>☁️ Синхронизация</b>
       <span id="lastSync" class="muted">Ещё не выполнялась</span>
       <div class="sync-actions">
-        <button class="btn2" onclick="exportData()">Скачать резерв</button>
-        <button class="btn2" onclick="importData()">Восстановить</button>
-        <button id="syncMainBtn" class="btn" onclick="fullSync()">Синхронизировать</button>
-        <button class="btn2" onclick="pullCloud()">Загрузить из облака</button>
-        <button class="btn2" onclick="pushLocal()">Отправить в облако</button>
+        <button class="btn2" onclick="exportData()"><span class="btn-icon">⬇️</span><span>Скачать резерв</span></button>
+        <button class="btn2" onclick="importData()"><span class="btn-icon">♻️</span><span>Восстановить</span></button>
+        <button id="syncMainBtn" class="btn accent pulse-btn" onclick="fullSync()"><span class="btn-icon">🔄</span><span>Синхронизировать</span></button>
+        <button class="btn2" onclick="pullCloud()"><span class="btn-icon">☁️</span><span>Загрузить из облака</span></button>
+        <button class="btn2" onclick="pushLocal()"><span class="btn-icon">📤</span><span>Отправить в облако</span></button>
       </div>
       <div id="syncMessage" class="sync-message"></div>
     </div>
@@ -632,9 +808,9 @@
         <h2 class="section-title">Добавить рассрочку</h2>
         <div class="formgrid">
           <input id="fullName" placeholder="ФИО клиента">
-          <input id="phone" placeholder="8 (928) 965-23-17" inputmode="tel" maxlength="18">
+          <input id="phone" placeholder="Телефон" inputmode="tel" maxlength="18" title="Номер форматируется автоматически: 8 (938) 086-64-51">
           <input id="address" placeholder="Адрес">
-          <input id="passportNumber" placeholder="96 13 257123" inputmode="numeric" maxlength="12">
+          <input id="passportNumber" placeholder="Серия и номер паспорта" inputmode="numeric" maxlength="12" title="Форматируется автоматически: 96 13 257213">
           <input id="passportIssued" placeholder="Кем выдан">
           <input id="passportDate" type="date">
           <input id="product" placeholder="Товар">
@@ -648,8 +824,8 @@
           </div>
         </div>
         <div class="actions">
-          <button class="btn" onclick="addInstallment()">Сохранить</button>
-          <div class="muted">Данные хранятся локально и при необходимости синхронизируются с облаком. Интерфейс поддерживает светлый и тёмный режим.</div>
+          <button class="btn accent" onclick="addInstallment()"><span class="btn-icon">💾</span><span>Сохранить</span></button>
+          <div class="muted">Данные хранятся локально и при необходимости синхронизируются с облаком. Телефон и паспорт форматируются автоматически при вводе.</div>
         </div>
       </div>
 
@@ -690,16 +866,15 @@ function importData() {
 function showToast(message, type = "success") {
   const container = document.getElementById("toastContainer");
   if (!container) return;
+  const icons = { success: "✅", error: "⛔", info: "ℹ️" };
   const toast = document.createElement("div");
   toast.className = `toast ${type}`;
-  toast.textContent = message;
+  toast.innerHTML = `<span class="toast-icon">${icons[type] || "🔔"}</span><span>${message}</span>`;
   container.appendChild(toast);
   setTimeout(() => {
-    toast.style.opacity = "0";
-    toast.style.transform = "translateY(-8px)";
-    toast.style.transition = "all .2s ease";
-  }, 2200);
-  setTimeout(() => toast.remove(), 2600);
+    toast.classList.add("toast-out");
+  }, 2300);
+  setTimeout(() => toast.remove(), 2700);
 }
 
 
@@ -797,7 +972,7 @@ function updateThemeToggleLabel() {
   const btn = document.getElementById("themeToggleBtn");
   if (!btn) return;
   const isDark = document.body.classList.contains("dark-theme");
-  btn.textContent = isDark ? "☀️ Светлый режим" : "🌙 Тёмный режим";
+  btn.innerHTML = isDark ? '<span class="btn-icon">☀️</span><span>Светлый режим</span>' : '<span class="btn-icon">🌙</span><span>Тёмный режим</span>';
 }
 
 function initTheme() {
@@ -1322,7 +1497,7 @@ function render(){
   if (printBtn) printBtn.style.display = item ? "block" : "none";
   const details = document.getElementById("details");
   if (!item) {
-    details.innerHTML = "<h2 class='section-title'>Договор рассрочки</h2><p class='muted'>Выбери или добавь рассрочку.</p>";
+    details.innerHTML = "<h2 class='section-title'><span class='section-icon'>📄</span>Договор рассрочки</h2><p class='muted'>Выбери или добавь рассрочку.</p>";
     return;
   }
 
@@ -1337,14 +1512,14 @@ function render(){
     <td>${formatDate(p.paidAt)}</td>
     <td>${rub(p.amount)}</td>
     <td>${p.comment || ""}</td>
-    <td><button class="btn2" onclick="editPayment(${p.id})">Изменить</button> <button class="soft-danger" onclick="deletePayment(${p.id})">Отменить</button></td>
+    <td><button class="btn2" onclick="editPayment(${p.id})"><span class="btn-icon">✏️</span><span>Изменить</span></button> <button class="soft-danger" onclick="deletePayment(${p.id})"><span class="btn-icon">↩</span><span>Отменить</span></button></td>
   </tr>`).join("");
 
   const remaining = Math.max(0, Number(item.totalPrice) - totalPaid(item));
 
   details.innerHTML = `
     <div class="no-print" style="display:flex;justify-content:space-between;gap:10px;align-items:start;">
-      <div><h2 class="section-title">Карточка рассрочки</h2><p class="muted">Выбран: <b>${item.fullName}</b></p><p><span class="mini-badge ${clientTrust(item).cls}">${clientTrust(item).label}</span></p></div>
+      <div><h2 class="section-title"><span class="section-icon">📄</span>Карточка рассрочки</h2><p class="muted">Выбран: <b>${item.fullName}</b></p><p><span class="mini-badge ${clientTrust(item).cls}">${clientTrust(item).label}</span></p></div>
       
     </div>
 
@@ -1359,19 +1534,19 @@ function render(){
         <div class="box"><span class="muted">Остаток</span><br><b>${rub(remaining)}</b></div>
       </div>
 
-      <h3>График в приложении</h3>
+      <h3><span class="section-icon small">📅</span>График в приложении</h3>
       <table><thead><tr><th>№</th><th>Дата</th><th>Сумма</th><th>Статус</th></tr></thead><tbody>${planRowsForApp}</tbody></table>
 
-      <h3>Принять оплату</h3>
+      <h3><span class="section-icon small">💸</span>Принять оплату</h3>
       <div class="two">
         <input id="payAmount" type="number" placeholder="Сумма оплаты">
         <input id="payDate" type="date" value="${today()}">
       </div>
-      <div class="two" style="margin-top:8px;"><button class="btn" onclick="addPayment()">Принять оплату</button><button class="btn2" onclick="quickNextPayment()">Оплатить следующий платёж</button></div>
+      <div class="two" style="margin-top:8px;"><button class="btn accent" onclick="addPayment()"><span class="btn-icon">✅</span><span>Принять оплату</span></button><button class="btn2" onclick="quickNextPayment()"><span class="btn-icon">➡️</span><span>Оплатить следующий платёж</span></button></div>
 
-      <h3>История оплат</h3>
+      <h3><span class="section-icon small">🕘</span>История оплат</h3>
       ${paymentRows ? `<table><thead><tr><th>Дата</th><th>Сумма</th><th>Комментарий</th><th>Действие</th></tr></thead><tbody>${paymentRows}</tbody></table>` : `<p class="muted">Пока оплат нет, кроме первого взноса.</p>`}
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;"><button class="btn" id="printBtn" onclick="printContract()">Печать договора</button><button class="danger" onclick="deleteItem()">Удалить рассрочку</button></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;"><button class="btn" id="printBtn" onclick="printContract()"><span class="btn-icon">🖨️</span><span>Печать договора</span></button><button class="danger" onclick="deleteItem()"><span class="btn-icon">🗑️</span><span>Удалить рассрочку</span></button></div>
     </div>
 
     <div class="contract-body">
@@ -1414,17 +1589,36 @@ function render(){
       <div class="copy-note">Договор печатается в двух экземплярах: один для Покупателя, один для Продавца.</div>
     </div>
   `;
+  attachRippleEffects(details);
 }
 checkLogin();
 prefillDefaultPaymentDate();
 render();
 
+function attachRippleEffects(root = document) {
+  root.querySelectorAll("button").forEach(btn => {
+    if (btn.dataset.rippleBound === "1") return;
+    btn.dataset.rippleBound = "1";
+    btn.addEventListener("pointerdown", (event) => {
+      const rect = btn.getBoundingClientRect();
+      const ripple = document.createElement("span");
+      ripple.className = "ripple";
+      ripple.style.left = (event.clientX - rect.left) + "px";
+      ripple.style.top = (event.clientY - rect.top) + "px";
+      btn.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 520);
+    });
+  });
+}
+
 document.addEventListener("click", (event) => {
   const btn = event.target.closest("button");
   if (!btn) return;
-  btn.style.transform = "scale(0.96)";
-  setTimeout(() => btn.style.transform = "", 120);
+  btn.classList.add("clicked");
+  setTimeout(() => btn.classList.remove("clicked"), 180);
 });
+
+attachRippleEffects();
 </script>
 </div>
 </body>
