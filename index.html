@@ -851,6 +851,66 @@
       background: rgba(255,255,255,.28);
     }
 
+
+    .input-mask-hint {
+      display: none;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: #fff3cd;
+      color: #7a4b00;
+      font-size: 13px;
+      font-weight: 700;
+      border: 1px solid rgba(245, 158, 11, .28);
+    }
+    .input-mask-hint.visible {
+      display: block;
+      animation: fadeUp .18s ease both;
+    }
+    input.mask-error {
+      border-color: #dc2626 !important;
+      box-shadow: 0 0 0 4px rgba(220, 38, 38, .13) !important;
+      background: #fff7f7 !important;
+    }
+    body.dark-theme .input-mask-hint {
+      background: rgba(180, 83, 9, .22);
+      color: #ffd99a;
+      border-color: rgba(251, 191, 36, .25);
+    }
+    body.dark-theme input.mask-error {
+      border-color: #fb7185 !important;
+      box-shadow: 0 0 0 4px rgba(251, 113, 133, .16) !important;
+      background: rgba(75, 29, 39, .68) !important;
+    }
+
+
+    .client-repeat-btn {
+      align-self: flex-start;
+      white-space: nowrap;
+    }
+    .client-history {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 20px;
+      background: rgba(241, 245, 249, .65);
+      border: 1px solid rgba(148, 163, 184, .16);
+    }
+    .history-table {
+      margin-top: 10px;
+    }
+    .history-table tr {
+      cursor: pointer;
+    }
+    body.dark-theme .client-history {
+      background: rgba(18, 42, 68, .55);
+      border-color: rgba(95, 137, 198, .18);
+    }
+    @media (max-width: 760px) {
+      .client-repeat-btn {
+        width: 100%;
+      }
+    }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -947,6 +1007,7 @@
             <input id="firstPaymentDate" type="date" title="Дата первого ежемесячного платежа">
           </div>
         </div>
+        <div id="inputMaskHint" class="input-mask-hint"></div>
         <div class="actions">
           <button class="btn accent" onclick="addInstallment()"><span class="btn-icon">💾</span><span>Сохранить</span></button>
           <div class="muted">Данные хранятся локально и при необходимости синхронизируются с облаком. Телефон и паспорт форматируются автоматически при вводе.</div>
@@ -1002,12 +1063,72 @@ function showToast(message, type = "success") {
 }
 
 
+function digitsOnly(value) {
+  return String(value || "").replace(/\D/g, "");
+}
+
 function formatPassportNumber(value) {
-  const digits = String(value || "").replace(/\D/g, "").slice(0, 10);
-  const p1 = digits.slice(0, 2);
-  const p2 = digits.slice(2, 4);
-  const p3 = digits.slice(4, 10);
-  return [p1, p2, p3].filter(Boolean).join(" ");
+  const digits = digitsOnly(value);
+  const main = digits.slice(0, 10);
+  const extra = digits.slice(10);
+
+  const p1 = main.slice(0, 2);
+  const p2 = main.slice(2, 4);
+  const p3 = main.slice(4, 10);
+  const formatted = [p1, p2, p3].filter(Boolean).join(" ");
+
+  // Лишние цифры НЕ удаляем молча — показываем их в конце, чтобы ошибка была заметна.
+  return extra ? `${formatted} ${extra}` : formatted;
+}
+
+function formatPhoneNumber(value) {
+  let digits = digitsOnly(value);
+  if (!digits) return "";
+
+  // Если пользователь начал с 9, автоматически добавляем 8.
+  if (digits[0] === "7") digits = "8" + digits.slice(1);
+  if (digits[0] !== "8" && digits.length <= 10) digits = "8" + digits;
+
+  const main = digits.slice(0, 11);
+  const extra = digits.slice(11);
+
+  let result = main.slice(0, 1);
+  if (main.length > 1) result += " (" + main.slice(1, 4);
+  if (main.length >= 4) result += ")";
+  if (main.length > 4) result += " " + main.slice(4, 7);
+  if (main.length > 7) result += "-" + main.slice(7, 9);
+  if (main.length > 9) result += "-" + main.slice(9, 11);
+
+  // Лишние цифры оставляем видимыми в конце.
+  return extra ? `${result} ${extra}` : result;
+}
+
+function updateMaskWarnings() {
+  const phone = document.getElementById("phone");
+  const passport = document.getElementById("passportNumber");
+  const hint = document.getElementById("inputMaskHint");
+
+  const phoneDigits = digitsOnly(phone?.value || "");
+  const passportDigits = digitsOnly(passport?.value || "");
+
+  const warnings = [];
+
+  if (phone) {
+    const phoneTooLong = phoneDigits.length > 11;
+    phone.classList.toggle("mask-error", phoneTooLong);
+    if (phoneTooLong) warnings.push(`Телефон: лишних цифр — ${phoneDigits.length - 11}`);
+  }
+
+  if (passport) {
+    const passportTooLong = passportDigits.length > 10;
+    passport.classList.toggle("mask-error", passportTooLong);
+    if (passportTooLong) warnings.push(`Паспорт: лишних цифр — ${passportDigits.length - 10}`);
+  }
+
+  if (hint) {
+    hint.textContent = warnings.length ? warnings.join(" · ") : "";
+    hint.classList.toggle("visible", warnings.length > 0);
+  }
 }
 
 function bindPassportFormatter() {
@@ -1015,29 +1136,10 @@ function bindPassportFormatter() {
   if (!input || input.dataset.bound === "1") return;
   input.dataset.bound = "1";
   input.addEventListener("input", () => {
-    const start = input.selectionStart;
     input.value = formatPassportNumber(input.value);
     try { input.setSelectionRange(input.value.length, input.value.length); } catch (e) {}
+    updateMaskWarnings();
   });
-}
-
-
-let listFilter = "all";
-
-function formatPhoneNumber(value) {
-  let digits = String(value || "").replace(/\D/g, "");
-  if (!digits) return "";
-  if (digits[0] === "7") digits = "8" + digits.slice(1);
-  if (digits[0] !== "8" && digits.length <= 10) digits = "8" + digits;
-  digits = digits.slice(0, 11);
-
-  let result = digits.slice(0, 1);
-  if (digits.length > 1) result += " (" + digits.slice(1, 4);
-  if (digits.length >= 4) result += ")";
-  if (digits.length > 4) result += " " + digits.slice(4, 7);
-  if (digits.length > 7) result += "-" + digits.slice(7, 9);
-  if (digits.length > 9) result += "-" + digits.slice(9, 11);
-  return result;
 }
 
 function bindPhoneFormatter() {
@@ -1047,6 +1149,7 @@ function bindPhoneFormatter() {
   input.addEventListener("input", () => {
     input.value = formatPhoneNumber(input.value);
     try { input.setSelectionRange(input.value.length, input.value.length); } catch (e) {}
+    updateMaskWarnings();
   });
 }
 
@@ -1464,6 +1567,59 @@ function status(item){
   if (plannedSchedule(item).some(p => scheduleStatus(item,p) === "Просрочен")) return "Просрочка";
   return "Активная";
 }
+
+function getClientKey(item) {
+  const phoneDigits = digitsOnly(item?.phone || "");
+  if (phoneDigits) return "phone:" + phoneDigits;
+  return "name:" + String(item?.fullName || "").trim().toLowerCase();
+}
+
+function clientContracts(item) {
+  if (!item) return [];
+  const key = getClientKey(item);
+  return installments
+    .filter(x => getClientKey(x) === key)
+    .sort((a, b) => Number(b.id) - Number(a.id));
+}
+
+function totalClientPurchases(item) {
+  return clientContracts(item).reduce((sum, x) => sum + Number(x.totalPrice || 0), 0);
+}
+
+function fillNewInstallmentForClient(id) {
+  const item = installments.find(x => String(x.id) === String(id));
+  if (!item) return;
+
+  const map = {
+    fullName: item.fullName || "",
+    phone: formatPhoneNumber(item.phone || ""),
+    address: item.address || "",
+    passportNumber: formatPassportNumber(item.passportNumber || ""),
+    passportIssued: item.passportIssued || "",
+    passportDate: item.passportDate || ""
+  };
+
+  Object.entries(map).forEach(([field, value]) => {
+    const el = document.getElementById(field);
+    if (el) el.value = value;
+  });
+
+  ["product", "model", "totalPrice", "downPayment"].forEach(field => {
+    const el = document.getElementById(field);
+    if (el) el.value = "";
+  });
+
+  const months = document.getElementById("months");
+  if (months) months.value = "6";
+  prefillDefaultPaymentDate();
+  updateMaskWarnings();
+
+  const product = document.getElementById("product");
+  if (product) product.focus();
+
+  showToast("Данные клиента перенесены. Добавь новый товар.", "info");
+}
+
 function addInstallment(){
   const fields = ["fullName","phone","address","passportNumber","passportIssued","passportDate","product","model","totalPrice","downPayment","months","firstPaymentDate"];
   const item = { id: Date.now(), payments: [], createdAt: today(), updated_at: nowIso() };
@@ -1475,6 +1631,23 @@ function addInstallment(){
   }
   if (!item.fullName || !item.product || !item.totalPrice) {
     showToast("Заполни ФИО, товар и стоимость", "error");
+    return;
+  }
+
+  const phoneDigits = digitsOnly(item.phone);
+  const passportDigits = digitsOnly(item.passportNumber);
+
+  if (phoneDigits && phoneDigits.length !== 11) {
+    showToast("Телефон должен быть из 11 цифр", "error");
+    document.getElementById("phone")?.focus();
+    updateMaskWarnings();
+    return;
+  }
+
+  if (passportDigits && passportDigits.length !== 10) {
+    showToast("Паспорт должен быть из 10 цифр", "error");
+    document.getElementById("passportNumber")?.focus();
+    updateMaskWarnings();
     return;
   }
   if (!item.firstPaymentDate) item.firstPaymentDate = nextMonthSameDay();
@@ -1502,6 +1675,7 @@ function addInstallment(){
     if (el && f !== "months") el.value = ""; 
   });
   document.getElementById("months").value = "6";
+  updateMaskWarnings();
   prefillDefaultPaymentDate();
   render();
   showToast("Рассрочка добавлена", "success");
@@ -1646,6 +1820,16 @@ function render(){
   </tr>`).join("");
 
   const remaining = Math.max(0, Number(item.totalPrice) - totalPaid(item));
+  const sameClientContracts = clientContracts(item);
+  const clientHistoryRows = sameClientContracts.map(contract => {
+    const current = String(contract.id) === String(item.id) ? " <span class='muted'>(текущий)</span>" : "";
+    return `<tr onclick="selectItem(${contract.id})">
+      <td>${formatDate(contract.createdAt || today())}</td>
+      <td>${contract.product || "—"}<br><span class="muted">Модель: ${contract.model || "—"}</span>${current}</td>
+      <td>${rub(contract.totalPrice || 0)}</td>
+      <td><span class="status ${status(contract) === "Просрочка" ? "overdue" : status(contract) === "Закрыта" ? "closed" : ""}">${status(contract)}</span></td>
+    </tr>`;
+  }).join("");
 
   details.innerHTML = `
     <div class="no-print" style="display:flex;justify-content:space-between;gap:10px;align-items:start;">
@@ -1662,6 +1846,15 @@ function render(){
         <div class="box"><span class="muted">Первый взнос</span><br><b>${rub(item.downPayment)}</b></div>
         <div class="box"><span class="muted">Оплачено дополнительно</span><br><b>${rub(sumPayments(item))}</b></div>
         <div class="box"><span class="muted">Остаток</span><br><b>${rub(remaining)}</b></div>
+      </div>
+
+      <div class="client-history">
+        <h3><span class="section-icon small">🗂️</span>История клиента</h3>
+        <div class="two">
+          <div class="box"><span class="muted">Договоров клиента</span><br><b>${sameClientContracts.length}</b></div>
+          <div class="box"><span class="muted">Общая сумма покупок</span><br><b>${rub(totalClientPurchases(item))}</b></div>
+        </div>
+        ${sameClientContracts.length > 1 ? `<table class="history-table"><thead><tr><th>Дата</th><th>Товар</th><th>Сумма</th><th>Статус</th></tr></thead><tbody>${clientHistoryRows}</tbody></table>` : `<p class="muted">У этого клиента пока один договор.</p>`}
       </div>
 
       <h3><span class="section-icon small">📅</span>График в приложении</h3>
