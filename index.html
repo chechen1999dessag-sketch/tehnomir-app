@@ -54,6 +54,11 @@
     .signatures { display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:45px; }
     .sign-line { border-top:1px solid #111; text-align:center; padding-top:8px; }
     .copy-note { text-align:center; font-size:12px; color:#555; margin-top:20px; }
+    .sync-panel { margin: 14px 0; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .sync-box { background: white; border-radius: 18px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .sync-box b { display:block; margin-bottom: 4px; }
+    .sync-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    @media (max-width: 900px) { .sync-panel { grid-template-columns: 1fr; } }
     @media (max-width: 900px) {
       .grid4, .layout, .formgrid, .two, .three { grid-template-columns: 1fr; }
       .header { display: block; }
@@ -99,6 +104,26 @@
     <div class="card"><div class="stat-title">Просрочки</div><div id="overdueCount" class="stat-value">0</div></div>
     <div class="card"><div class="stat-title">Поступило сегодня</div><div id="receivedToday" class="stat-value">0 ₽</div></div>
     <div class="card"><div class="stat-title">Общий долг</div><div id="totalDebt" class="stat-value">0 ₽</div></div>
+  </div>
+
+  <div class="sync-panel no-print">
+    <div class="sync-box">
+      <b>Режим работы</b>
+      <span id="workMode" class="muted">Проверка...</span>
+    </div>
+    <div class="sync-box">
+      <b>Очередь изменений</b>
+      <span id="pendingCount" class="muted">0 изменений</span>
+    </div>
+    <div class="sync-box">
+      <b>Синхронизация</b>
+      <span id="lastSync" class="muted">Ещё не выполнялась</span>
+      <div class="sync-actions">
+        <button class="btn" onclick="fullSync()">Синхронизировать</button>
+        <button class="btn2" onclick="pullCloud()">Загрузить из облака</button>
+        <button class="btn2" onclick="pushLocal()">Отправить в облако</button>
+      </div>
+    </div>
   </div>
 
   <div class="layout">
@@ -180,6 +205,10 @@ function prefillDefaultPaymentDate() {
 }
 
 const KEY = "tehnomir_installments_cloud_backup";
+const PENDING_KEY = KEY + "_pending";
+const DELETED_KEY = KEY + "_deleted";
+const LAST_SYNC_KEY = KEY + "_last_sync";
+
 const SUPABASE_URL = "https://lvgmpdowceydkbnlnvct.supabase.co";
 const SUPABASE_KEY = "sb_publishable_woekH2OEjXmtd-b_NYfbbA_QKIfukKK";
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -187,8 +216,116 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let installments = JSON.parse(localStorage.getItem(KEY) || "[]");
 let selectedId = installments[0]?.id || null;
 let cloudReady = false;
+let pendingChanges = JSON.parse(localStorage.getItem(PENDING_KEY) || "[]");
+let deletedIds = JSON.parse(localStorage.getItem(DELETED_KEY) || "[]");
+let syncInProgress = false;
 
-async function loadCloud() {
+function nowIso() {
+  return new Date().toISOString();
+}
+
+function normalizeItem(item) {
+  if (!item.updated_at) item.updated_at = nowIso();
+  if (!item.createdAt) item.createdAt = today();
+  return item;
+}
+
+function persistLocal() {
+  localStorage.setItem(KEY, JSON.stringify(installments));
+  localStorage.setItem(PENDING_KEY, JSON.stringify(pendingChanges));
+  localStorage.setItem(DELETED_KEY, JSON.stringify(deletedIds));
+}
+
+function queueChange(type, itemOrId) {
+  const id = String(type === "delete" ? itemOrId : itemOrId.id);
+  pendingChanges = pendingChanges.filter(ch => String(ch.id) !== id);
+  pendingChanges.push({
+    id,
+    type,
+    data: type === "delete" ? null : itemOrId,
+    updated_at: nowIso()
+  });
+  persistLocal();
+}
+
+async function testCloud() {
+  try {
+    const { error } = await supabaseClient
+      .from("installments")
+      .select("id")
+      .limit(1);
+    if (error) throw error;
+    cloudReady = true;
+  } catch (e) {
+    cloudReady = false;
+  }
+  updateSyncUi();
+  return cloudReady;
+}
+
+async function pushLocal() {
+  if (syncInProgress) return;
+  syncInProgress = true;
+  updateSyncUi("Отправка в облако...");
+
+  const ok = await testCloud();
+  if (!ok) {
+    syncInProgress = false;
+    updateSyncUi("Облако недоступно. Работаем оффлайн.");
+    return;
+  }
+
+  try {
+    const deletes = pendingChanges.filter(ch => ch.type === "delete").map(ch => String(ch.id));
+    if (deletes.length) {
+      const { error } = await supabaseClient
+        .from("installments")
+        .delete()
+        .in("id", deletes);
+      if (error) throw error;
+      deletedIds = deletedIds.filter(id => !deletes.includes(String(id)));
+    }
+
+    const upserts = pendingChanges
+      .filter(ch => ch.type !== "delete" && ch.data)
+      .map(ch => ({
+        id: String(ch.id),
+        data: normalizeItem(ch.data),
+        updated_at: ch.data.updated_at || ch.updated_at
+      }));
+
+    if (upserts.length) {
+      const { error } = await supabaseClient
+        .from("installments")
+        .upsert(upserts, { onConflict: "id" });
+      if (error) throw error;
+    }
+
+    pendingChanges = [];
+    localStorage.setItem(LAST_SYNC_KEY, new Date().toLocaleString("ru-RU"));
+    persistLocal();
+    updateSyncUi("Локальные изменения отправлены в облако.");
+  } catch (e) {
+    console.warn("Push error:", e);
+    updateSyncUi("Ошибка отправки в облако.");
+  } finally {
+    syncInProgress = false;
+    render();
+  }
+}
+
+async function pullCloud() {
+  if (syncInProgress) return;
+  syncInProgress = true;
+  updateSyncUi("Загрузка из облака...");
+
+  const ok = await testCloud();
+  if (!ok) {
+    syncInProgress = false;
+    updateSyncUi("Облако недоступно. Работаем оффлайн.");
+    return;
+  }
+
   try {
     const { data, error } = await supabaseClient
       .from("installments")
@@ -196,42 +333,69 @@ async function loadCloud() {
       .order("created_at", { ascending: false });
     if (error) throw error;
 
-    installments = (data || []).map(row => row.data);
+    const deletedSet = new Set(deletedIds.map(String));
+    const localMap = new Map(installments.map(item => [String(item.id), normalizeItem(item)]));
+
+    (data || []).forEach(row => {
+      const cloudItem = normalizeItem(row.data);
+      const id = String(cloudItem.id);
+      if (deletedSet.has(id)) return;
+
+      const localItem = localMap.get(id);
+      if (!localItem) {
+        localMap.set(id, cloudItem);
+        return;
+      }
+
+      const cloudTime = new Date(cloudItem.updated_at || row.updated_at || 0).getTime();
+      const localTime = new Date(localItem.updated_at || 0).getTime();
+
+      if (cloudTime > localTime) {
+        localMap.set(id, cloudItem);
+      }
+    });
+
+    installments = Array.from(localMap.values()).sort((a, b) => String(b.id).localeCompare(String(a.id)));
     selectedId = installments[0]?.id || null;
-    localStorage.setItem(KEY, JSON.stringify(installments));
-    cloudReady = true;
-    render();
+
+    localStorage.setItem(LAST_SYNC_KEY, new Date().toLocaleString("ru-RU"));
+    persistLocal();
+    updateSyncUi("Данные загружены из облака.");
   } catch (e) {
-    console.warn("Cloud load error:", e);
-    cloudReady = false;
+    console.warn("Pull error:", e);
+    updateSyncUi("Ошибка загрузки из облака.");
+  } finally {
+    syncInProgress = false;
     render();
   }
 }
 
-async function save() {
-  localStorage.setItem(KEY, JSON.stringify(installments));
-
-  if (!cloudReady) return;
-
-  try {
-    const rows = installments.map(item => ({
-      id: String(item.id),
-      data: item,
-      updated_at: new Date().toISOString()
-    }));
-
-    if (rows.length) {
-      const { error } = await supabaseClient
-        .from("installments")
-        .upsert(rows, { onConflict: "id" });
-      if (error) throw error;
-    }
-  } catch (e) {
-    console.warn("Cloud save error:", e);
-  }
+async function fullSync() {
+  await pushLocal();
+  await pullCloud();
 }
 
-loadCloud();
+async function save({ silent = false } = {}) {
+  installments = installments.map(normalizeItem);
+  persistLocal();
+
+  if (!silent) updateSyncUi("Сохранено локально. Для облака нажми синхронизацию.");
+}
+
+function updateSyncUi(message) {
+  const workMode = document.getElementById("workMode");
+  const pendingCount = document.getElementById("pendingCount");
+  const lastSync = document.getElementById("lastSync");
+  const cloudStatus = document.getElementById("cloudStatus");
+
+  const statusText = cloudReady ? "Облако доступно" : "Оффлайн / облако недоступно";
+  if (workMode) workMode.textContent = message || statusText;
+  if (pendingCount) pendingCount.textContent = `${pendingChanges.length} изменений ожидает синхронизации`;
+  if (lastSync) lastSync.textContent = localStorage.getItem(LAST_SYNC_KEY) ? `Последняя: ${localStorage.getItem(LAST_SYNC_KEY)}` : "Ещё не выполнялась";
+  if (cloudStatus) cloudStatus.textContent = cloudReady ? "Облако доступно. Можно синхронизировать." : "Облако недоступно: работаешь локально.";
+}
+
+testCloud();
 function rub(v){ return Math.round(Number(v || 0)).toLocaleString("ru-RU") + " ₽"; }
 function today(){ return new Date().toISOString().slice(0,10); }
 function formatDate(d){ return d ? new Date(d).toLocaleDateString("ru-RU") : "—"; }
@@ -274,7 +438,7 @@ function status(item){
 }
 function addInstallment(){
   const fields = ["fullName","phone","address","passportNumber","passportIssued","passportDate","product","model","totalPrice","downPayment","months","firstPaymentDate"];
-  const item = { id: Date.now(), payments: [], createdAt: today() };
+  const item = { id: Date.now(), payments: [], createdAt: today(), updated_at: nowIso() };
   for (const f of fields) {
     const el = document.getElementById(f);
     item[f] = el ? el.value.trim() : "";
@@ -289,6 +453,7 @@ function addInstallment(){
   item.months = Math.min(12, Math.max(1, Number(item.months || 1)));
   installments.unshift(item);
   selectedId = item.id;
+  queueChange("upsert", item);
   save();
   fields.forEach(f => { 
     const el = document.getElementById(f);
@@ -310,6 +475,8 @@ function addPayment(){
   if (!amount || amount <= 0) return alert("Укажи сумму оплаты.");
   item.payments = item.payments || [];
   item.payments.push({id: Date.now(), amount, paidAt: date, comment});
+  item.updated_at = nowIso();
+  queueChange("upsert", item);
   save();
   render();
 }
@@ -344,6 +511,8 @@ function editPayment(paymentId){
   p.amount = Number(amount || 0);
   p.paidAt = date;
   p.comment = comment;
+  item.updated_at = nowIso();
+  queueChange("upsert", item);
   save();
   render();
 }
@@ -353,6 +522,8 @@ function deletePayment(paymentId){
   if (printBtn) printBtn.style.display = item ? "block" : "none";
   if (!item || !confirm("Удалить эту оплату?")) return;
   item.payments = (item.payments || []).filter(p => p.id !== paymentId);
+  item.updated_at = nowIso();
+  queueChange("upsert", item);
   save();
   render();
 }
@@ -361,6 +532,8 @@ function deleteItem(){
   const printBtn = document.getElementById("printBtn");
   if (printBtn) printBtn.style.display = item ? "block" : "none";
   if (!item || !confirm("Удалить рассрочку: " + item.fullName + "?")) return;
+  deletedIds.push(String(selectedId));
+  queueChange("delete", selectedId);
   installments = installments.filter(x => x.id !== selectedId);
   selectedId = installments[0]?.id || null;
   save();
