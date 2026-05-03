@@ -24,7 +24,9 @@
     input, button { font: inherit; }
     input { width: 100%; padding: 11px; border: 1px solid #ddd; border-radius: 12px; background: white; }
     button { border: 0; border-radius: 14px; padding: 11px 14px; cursor: pointer; font-weight: 700; }
-    .btn { background: #111; color: white; }
+    .btn {
+  transition: all 0.2s ease;
+ background: #111; color: white; }
     .btn2 { background: #eee; color: #111; }
     .danger { background: #b91c1c; color: white; }
     .soft-danger { background: #fee2e2; color: #991b1b; }
@@ -75,7 +77,21 @@
       th, td { padding: 6px; }
       .contract { padding: 0; }
     }
-  </style>
+  
+.btn:active {
+  transform: scale(0.96);
+}
+
+.btn.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.btn.success {
+  background: #16a34a !important;
+  color: #fff;
+}
+</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -371,8 +387,28 @@ async function pullCloud() {
 }
 
 async function fullSync() {
+  const btn = document.querySelector('button[onclick="fullSync()"]');
+  const originalText = btn ? btn.innerText : "";
+
+  if (btn) {
+    btn.classList.add("loading");
+    btn.innerText = "Синхронизация...";
+  }
+
   await pushLocal();
   await pullCloud();
+
+  if (btn) {
+    btn.innerText = "Готово ✓";
+    btn.classList.remove("loading");
+    btn.classList.add("success");
+
+    setTimeout(() => {
+      btn.classList.remove("success");
+      btn.innerText = originalText;
+    }, 1500);
+  }
+
 }
 
 async function save({ silent = false } = {}) {
