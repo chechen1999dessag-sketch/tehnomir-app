@@ -947,7 +947,7 @@
   <div class="header no-print">
     <div>
       <h1>Рассрочка ТехноМир</h1>
-      <p>Клиенты, оплаты, договор, печать и облачное хранение · v23</p><p id="cloudStatus" style="margin-top:4px;color:#aaa;font-size:13px;">Подключение к облаку...</p>
+      <p>Клиенты, оплаты, договор, печать и облачное хранение · v24</p><p id="cloudStatus" style="margin-top:4px;color:#aaa;font-size:13px;">Подключение к облаку...</p>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
       <button class="btn2 theme-toggle" id="themeToggleBtn" onclick="toggleTheme()"><span class="btn-icon">🌙</span><span>Тёмный режим</span></button>
@@ -1008,9 +1008,9 @@
         <h2 class="section-title">Добавить рассрочку</h2>
         <div class="formgrid">
           <input id="fullName" placeholder="ФИО клиента">
-          <input id="phone" placeholder="Телефон" inputmode="tel" oninput="this.value=formatPhoneNumber(this.value); updateMaskWarnings();" title="Введи цифры, например 89380866451 — формат поставится автоматически">
+          <input id="phone" placeholder="Телефон" inputmode="tel" onbeforeinput="rememberMaskState(this, event)" oninput="handlePhoneInput(this)" title="Введи цифры, например 89380866451 — формат поставится автоматически">
           <input id="address" placeholder="Адрес">
-          <input id="passportNumber" placeholder="Серия и номер паспорта" inputmode="numeric" oninput="this.value=formatPassportNumber(this.value); updateMaskWarnings();" title="Введи 10 цифр, например 9613257213 — пробелы поставятся автоматически">
+          <input id="passportNumber" placeholder="Серия и номер паспорта" inputmode="numeric" onbeforeinput="rememberMaskState(this, event)" oninput="handlePassportInput(this)" title="Введи 10 цифр, например 9613257213 — пробелы поставятся автоматически">
           <input id="passportIssued" placeholder="Кем выдан">
           <input id="passportDate" type="date">
           <input id="product" placeholder="Товар">
@@ -1083,22 +1083,61 @@ function digitsOnly(value) {
   return String(value || "").replace(/\D/g, "");
 }
 
-function formatPassportNumber(value) {
-  const digits = digitsOnly(value);
-  const main = digits.slice(0, 10);
-  const extra = digits.slice(10);
+function rememberMaskState(input, event) {
+  input.dataset.prevValue = input.value || "";
+  input.dataset.prevDigits = digitsOnly(input.value || "");
+  input.dataset.prevPos = String(input.selectionStart ?? input.value.length);
+  input.dataset.inputType = event?.inputType || "";
+}
+
+function removeDigitWhenDeletingFormat(input, digits) {
+  const type = input.dataset.inputType || "";
+  const prevDigits = input.dataset.prevDigits || "";
+  const prevValue = input.dataset.prevValue || "";
+  const prevPos = Number(input.dataset.prevPos || prevValue.length);
+
+  // Если пользователь нажал Backspace/Delete по скобке, пробелу или дефису,
+  // цифры не меняются. Тогда удаляем ближайшую цифру вручную.
+  if (!type.startsWith("delete") || digits !== prevDigits || !digits) return digits;
+
+  let digitIndex = 0;
+  for (let i = 0; i < prevPos; i++) {
+    if (/\d/.test(prevValue[i])) digitIndex++;
+  }
+
+  let removeIndex = type === "deleteContentForward" ? digitIndex : digitIndex - 1;
+  if (removeIndex < 0) removeIndex = digits.length - 1;
+  if (removeIndex >= digits.length) removeIndex = digits.length - 1;
+
+  return digits.slice(0, removeIndex) + digits.slice(removeIndex + 1);
+}
+
+function formatPassportDigits(digits) {
+  const main = String(digits || "").slice(0, 10);
+  const extra = String(digits || "").slice(10);
 
   const p1 = main.slice(0, 2);
   const p2 = main.slice(2, 4);
   const p3 = main.slice(4, 10);
   const formatted = [p1, p2, p3].filter(Boolean).join(" ");
 
-  // Лишние цифры НЕ удаляем молча — показываем их в конце, чтобы ошибка была заметна.
   return extra ? `${formatted} ${extra}` : formatted;
 }
 
-function formatPhoneNumber(value) {
-  let digits = digitsOnly(value);
+function formatPassportNumber(value) {
+  return formatPassportDigits(digitsOnly(value));
+}
+
+function handlePassportInput(input) {
+  let digits = digitsOnly(input.value);
+  digits = removeDigitWhenDeletingFormat(input, digits);
+  input.value = formatPassportDigits(digits);
+  try { input.setSelectionRange(input.value.length, input.value.length); } catch (e) {}
+  updateMaskWarnings();
+}
+
+function formatPhoneDigits(digits) {
+  digits = String(digits || "");
   if (!digits) return "";
 
   // 8938... => 8 (938)...
@@ -1117,8 +1156,19 @@ function formatPhoneNumber(value) {
   if (main.length > 7) result += "-" + main.slice(7, 9);
   if (main.length > 9) result += "-" + main.slice(9, 11);
 
-  // Лишние цифры показываем в конце, не скрываем.
   return extra ? `${result} ${extra}` : result;
+}
+
+function formatPhoneNumber(value) {
+  return formatPhoneDigits(digitsOnly(value));
+}
+
+function handlePhoneInput(input) {
+  let digits = digitsOnly(input.value);
+  digits = removeDigitWhenDeletingFormat(input, digits);
+  input.value = formatPhoneDigits(digits);
+  try { input.setSelectionRange(input.value.length, input.value.length); } catch (e) {}
+  updateMaskWarnings();
 }
 
 function updateMaskWarnings() {
@@ -1153,22 +1203,16 @@ function bindPassportFormatter() {
   const input = document.getElementById("passportNumber");
   if (!input || input.dataset.bound === "1") return;
   input.dataset.bound = "1";
-  input.addEventListener("input", () => {
-    input.value = formatPassportNumber(input.value);
-    try { input.setSelectionRange(input.value.length, input.value.length); } catch (e) {}
-    updateMaskWarnings();
-  });
+  input.addEventListener("beforeinput", (event) => rememberMaskState(input, event));
+  input.addEventListener("input", () => handlePassportInput(input));
 }
 
 function bindPhoneFormatter() {
   const input = document.getElementById("phone");
   if (!input || input.dataset.bound === "1") return;
   input.dataset.bound = "1";
-  input.addEventListener("input", () => {
-    input.value = formatPhoneNumber(input.value);
-    try { input.setSelectionRange(input.value.length, input.value.length); } catch (e) {}
-    updateMaskWarnings();
-  });
+  input.addEventListener("beforeinput", (event) => rememberMaskState(input, event));
+  input.addEventListener("input", () => handlePhoneInput(input));
 }
 
 function clientTrust(item) {
