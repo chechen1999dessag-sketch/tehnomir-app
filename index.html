@@ -2450,6 +2450,62 @@ tbody tr.selected td:first-child:before{
 .stat-title{font-size:14px !important;color:#7c8ba3 !important;margin-bottom:6px}
 .stat-value{font-size:30px !important;line-height:1.05 !important;letter-spacing:-.02em}
 
+
+/* v38 fixes: products tab icon + cleaner selected product row */
+.nav-ico.nav-products{
+  background:none !important;
+  border:none !important;
+  box-shadow:none !important;
+  padding:0 !important;
+}
+.nav-ico.nav-products svg{
+  width:20px !important;
+  height:20px !important;
+  display:block !important;
+}
+
+#productsTable{
+  border-collapse:separate !important;
+  border-spacing:0 8px !important;
+}
+#productsTable tr{
+  background:#fff;
+  transition:background .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+#productsTable tr td{
+  background:transparent;
+  border-top:1px solid transparent !important;
+  border-bottom:1px solid transparent !important;
+}
+#productsTable tr.selected{
+  background:linear-gradient(90deg,#edf5ff 0%,#f8fbff 100%) !important;
+  box-shadow:inset 5px 0 0 #0a6bff, 0 8px 18px rgba(10,107,255,.10) !important;
+  outline:none !important;
+  transform:none !important;
+}
+#productsTable tr.selected td{
+  border-top:1px solid rgba(10,107,255,.18) !important;
+  border-bottom:1px solid rgba(10,107,255,.18) !important;
+  box-shadow:none !important;
+}
+#productsTable tr.selected td:first-child{
+  border-left:1px solid rgba(10,107,255,.18) !important;
+  border-top-left-radius:18px !important;
+  border-bottom-left-radius:18px !important;
+}
+#productsTable tr.selected td:last-child{
+  border-right:1px solid rgba(10,107,255,.18) !important;
+  border-top-right-radius:18px !important;
+  border-bottom-right-radius:18px !important;
+}
+#productsTable tr.selected td:not(:first-child):not(:last-child){
+  border-left:none !important;
+  border-right:none !important;
+}
+#productsTable tr:hover{
+  background:#f7fbff !important;
+}
+
 </style>
 </head>
 <body>
@@ -2476,7 +2532,7 @@ tbody tr.selected td:first-child:before{
   <div class="nav-shell">
     <div class="tabs main-tabs primary-tabs">
       <button id="tab-dashboard" class="btn2 tab active" onclick="view('dashboard')"><span class="nav-ico home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 9.8V20h12V9.8"/><path d="M10 20v-5h4v5"/></svg></span><span>Главная</span></button>
-      <button id="tab-products" class="btn2 tab" onclick="view('products')"><span class="nav-ico box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6.6v10.8L12 21l7-3.6V6.6L12 3Z"/><path d="M5 6.6 12 10l7-3.4"/><path d="M12 10v11"/></svg></span><span>Товары</span></button>
+      <button id="tab-products" class="btn2 tab" onclick="view('products')"><span class="nav-ico nav-products"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6.6v10.8L12 21l7-3.6V6.6L12 3Z"/><path d="M5 6.6 12 10l7-3.4"/><path d="M12 10v11"/></svg></span><span>Товары</span></button>
       <button id="tab-receipt" class="btn2 tab" onclick="view('receipt')"><span class="nav-ico download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v9"/><path d="m8.5 10.5 3.5 3.5 3.5-3.5"/><path d="M5 19h14"/></svg></span><span>Поступление</span></button>
       <button id="tab-receipts" class="btn2 tab" onclick="view('receipts')"><span class="nav-ico receipt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10v18l-2-1.4L13 21l-2-1.4L9 21l-2-1.4L7 21V3Z"/><path d="M10 8h4M10 12h4M10 16h4"/></svg></span><span>Журнал</span></button>
       <button id="tab-sales" class="btn2 tab" onclick="view('sales')"><span class="nav-ico cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/><path d="M4 5h2l2.2 9.2a1 1 0 0 0 1 .8h8.6a1 1 0 0 0 1-.8L20 8H8.2"/></svg></span><span>Продажи</span></button>
