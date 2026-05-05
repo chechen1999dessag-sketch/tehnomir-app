@@ -2415,6 +2415,41 @@ tbody tr.selected td:first-child:before{
 .stat-icon svg{width:24px;height:24px}
 .nav-ico svg{width:16px;height:16px}
 
+
+/* v37 refined icon system */
+*{text-rendering:geometricPrecision;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.nav-ico{
+  width:20px !important;
+  height:20px !important;
+  min-width:20px !important;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-right:10px;
+  color:#72839d !important;
+  background:none !important;
+  border:none !important;
+  box-shadow:none !important;
+  border-radius:0 !important;
+  vertical-align:middle;
+}
+.nav-ico svg{display:block;width:20px;height:20px;shape-rendering:geometricPrecision}
+.main-tabs .tab,.sub-tabs .tab{display:inline-flex;align-items:center;justify-content:center;font-weight:800;gap:0}
+.main-tabs .tab.active,.sub-tabs .tab.active{color:#156dff !important;background:#fff !important;border-color:#dfe8f5 !important;box-shadow:0 10px 20px rgba(15,76,160,.08) !important;position:relative}
+.main-tabs .tab.active::after,.sub-tabs .tab.active::after{content:"";position:absolute;left:18px;right:18px;bottom:-1px;height:3px;border-radius:3px;background:linear-gradient(90deg,#1e7bff,#0e62ea);display:block !important}
+.main-tabs .tab.active .nav-ico,.sub-tabs .tab.active .nav-ico{color:#156dff !important;background:none !important}
+.main-tabs .tab:hover .nav-ico,.sub-tabs .tab:hover .nav-ico{color:#3c76d6 !important}
+
+.stat-card{padding:24px 22px 20px 96px !important;min-height:110px !important;position:relative;overflow:hidden}
+.stat-icon{position:absolute !important;left:20px !important;top:22px !important;width:56px !important;height:56px !important;border-radius:50% !important;display:grid !important;place-items:center !important;border:1px solid rgba(219,231,245,.9) !important;box-shadow:0 8px 18px rgba(20,54,100,.05), inset 0 1px 0 rgba(255,255,255,.9) !important}
+.stat-icon svg{width:26px !important;height:26px !important;shape-rendering:geometricPrecision}
+.stat-icon.stock{background:linear-gradient(135deg,#edf5ff,#e5efff) !important;color:#c08750 !important}
+.stat-icon.models{background:linear-gradient(135deg,#f1ebff,#eadfff) !important;color:#8b67f0 !important}
+.stat-icon.buy{background:linear-gradient(135deg,#ebfff0,#ddf8e6) !important;color:#1fb25b !important}
+.stat-icon.sales{background:linear-gradient(135deg,#fff5e7,#ffe8c9) !important;color:#f49a2f !important}
+.stat-title{font-size:14px !important;color:#7c8ba3 !important;margin-bottom:6px}
+.stat-value{font-size:30px !important;line-height:1.05 !important;letter-spacing:-.02em}
+
 </style>
 </head>
 <body>
@@ -2432,27 +2467,27 @@ tbody tr.selected td:first-child:before{
 
   <div class="control-panel no-print">
   <div class="stats">
-    <div class="card stat-card"><div class="stat-icon stock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 7 12 11l7.5-4L12 3Z"/><path d="M4.5 7v10L12 21l7.5-4V7"/><path d="M12 11v10"/></svg></div><div class="stat-title">В наличии</div><div id="stStock" class="stat-value">0</div></div>
-    <div class="card stat-card"><div class="stat-icon models"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2" opacity=".88"/><rect x="4" y="13" width="7" height="7" rx="2" opacity=".88"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg></div><div class="stat-title">Моделей</div><div id="stModels" class="stat-value">0</div></div>
-    <div class="card stat-card"><div class="stat-icon buy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8c0-2.2 1.8-4 4-4s4 1.8 4 4c0 1.6-.8 2.5-1.6 3.5-.9 1-1.4 2-1.4 3.5h-2c0-1.5-.5-2.5-1.4-3.5C8.8 10.5 8 9.6 8 8Z"/><path d="M7 18h10"/><path d="M8.5 21h7"/><path d="M12 9v4"/><path d="M10.5 10.5h3"/></svg></div><div class="stat-title">Закупка остатков</div><div id="stBuy" class="stat-value">0 ₽</div></div>
-    <div class="card stat-card"><div class="stat-icon sales"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h4"/></svg></div><div class="stat-title">Продаж сегодня</div><div id="stToday" class="stat-value">0</div></div>
+    <div class="card stat-card"><div class="stat-icon stock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6.8 12 10.5l7-3.7L12 3Z"/><path d="M5 6.8v10.4L12 21l7-3.8V6.8"/><path d="M12 10.5V21"/></svg></div><div class="stat-title">В наличии</div><div id="stStock" class="stat-value">0</div></div>
+    <div class="card stat-card"><div class="stat-icon models"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="7.2" height="7.2" rx="1.7"/><rect x="12.8" y="4" width="7.2" height="7.2" rx="1.7" opacity=".92"/><rect x="4" y="12.8" width="7.2" height="7.2" rx="1.7" opacity=".92"/><rect x="12.8" y="12.8" width="7.2" height="7.2" rx="1.7"/></svg></div><div class="stat-title">Моделей</div><div id="stModels" class="stat-value">0</div></div>
+    <div class="card stat-card"><div class="stat-icon buy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M8 10h7.2a1.8 1.8 0 0 1 0 3.6H10.5A1.5 1.5 0 0 0 9 15.1 1.5 1.5 0 0 0 10.5 16.5H16"/><path d="M12 8v8"/></svg></div><div class="stat-title">Закупка остатков</div><div id="stBuy" class="stat-value">0 ₽</div></div>
+    <div class="card stat-card"><div class="stat-icon sales"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16 10 11l3 3 6-7"/><path d="M15 7h4v4"/><path d="M5 20h14"/></svg></div><div class="stat-title">Продаж сегодня</div><div id="stToday" class="stat-value">0</div></div>
   </div>
 
   <div class="nav-shell">
     <div class="tabs main-tabs primary-tabs">
-      <button id="tab-dashboard" class="btn2 tab active" onclick="view('dashboard')"><span class="nav-ico home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.8V20h14V9.8"/><path d="M9.5 20v-6h5v6"/></svg></span><span>Главная</span></button>
-      <button id="tab-products" class="btn2 tab" onclick="view('products')"><span class="nav-ico box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 7 12 11l7.5-4L12 3Z"/><path d="M4.5 7v10L12 21l7.5-4V7"/><path d="M12 11v10"/></svg></span><span>Товары</span></button>
-      <button id="tab-receipt" class="btn2 tab" onclick="view('receipt')"><span class="nav-ico download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10"/><path d="m8 10 4 4 4-4"/><path d="M4 20h16"/></svg></span><span>Поступление</span></button>
-      <button id="tab-receipts" class="btn2 tab" onclick="view('receipts')"><span class="nav-ico file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6M9 9h2"/></svg></span><span>Журнал</span></button>
-      <button id="tab-sales" class="btn2 tab" onclick="view('sales')"><span class="nav-ico cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M3 4h2l2.5 10.5a1 1 0 0 0 1 .8h9.7a1 1 0 0 0 1-.8L21 7H7.2"/></svg></span><span>Продажи</span></button>
-      <button id="tab-labels" class="btn2 tab" onclick="view('labels')"><span class="nav-ico tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10 11 19a2.8 2.8 0 0 1-4 0l-2-2a2.8 2.8 0 0 1 0-4l9-9h6v6Z"/><circle cx="16.5" cy="7.5" r="1"/></svg></span><span>Этикетки</span></button>
+      <button id="tab-dashboard" class="btn2 tab active" onclick="view('dashboard')"><span class="nav-ico home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 9.8V20h12V9.8"/><path d="M10 20v-5h4v5"/></svg></span><span>Главная</span></button>
+      <button id="tab-products" class="btn2 tab" onclick="view('products')"><span class="nav-ico box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6.6v10.8L12 21l7-3.6V6.6L12 3Z"/><path d="M5 6.6 12 10l7-3.4"/><path d="M12 10v11"/></svg></span><span>Товары</span></button>
+      <button id="tab-receipt" class="btn2 tab" onclick="view('receipt')"><span class="nav-ico download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v9"/><path d="m8.5 10.5 3.5 3.5 3.5-3.5"/><path d="M5 19h14"/></svg></span><span>Поступление</span></button>
+      <button id="tab-receipts" class="btn2 tab" onclick="view('receipts')"><span class="nav-ico receipt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10v18l-2-1.4L13 21l-2-1.4L9 21l-2-1.4L7 21V3Z"/><path d="M10 8h4M10 12h4M10 16h4"/></svg></span><span>Журнал</span></button>
+      <button id="tab-sales" class="btn2 tab" onclick="view('sales')"><span class="nav-ico cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/><path d="M4 5h2l2.2 9.2a1 1 0 0 0 1 .8h8.6a1 1 0 0 0 1-.8L20 8H8.2"/></svg></span><span>Продажи</span></button>
+      <button id="tab-labels" class="btn2 tab" onclick="view('labels')"><span class="nav-ico qr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="M16 14v2M20 14v6M14 20h2M17 17h3"/></svg></span><span>Этикетки</span></button>
     </div>
     <div class="tabs sub-tabs secondary-tabs">
-      <button id="tab-inventory" class="btn2 tab sub-tab" onclick="view('inventory')"><span class="nav-ico clip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="4" width="10" height="16" rx="2"/><path d="M9 4.5h6a1.5 1.5 0 0 0-3-1 1.5 1.5 0 0 0-3 1Z"/><path d="M9 10h6M9 14h6"/></svg></span><span>Инвентаризация</span></button>
-      <button id="tab-reports" class="btn2 tab sub-tab" onclick="view('reports')"><span class="nav-ico chart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><path d="M7 16V10"/><path d="M12 16V6"/><path d="M17 16v-4"/></svg></span><span>Отчёты</span></button>
-      <button id="tab-activity" class="btn2 tab sub-tab" onclick="view('activity')"><span class="nav-ico clock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg></span><span>Действия</span></button>
-      <button id="tab-importexport" class="btn2 tab sub-tab" onclick="view('importexport')"><span class="nav-ico save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h8V4"/><path d="M9 20v-6h6v6"/></svg></span><span>Резерв</span></button>
-      <button id="tab-settings" class="btn2 tab sub-tab" onclick="view('settings')"><span class="nav-ico settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V22a2 2 0 0 1-4 0v-.09a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.88A1.7 1.7 0 0 0 2 14.97H2a2 2 0 0 1 0-4h.09a1.7 1.7 0 0 0 1.56-1.03 1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.88.34H8.03A1.7 1.7 0 0 0 9.06 4V3.91a2 2 0 0 1 4 0V4a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.88v.01A1.7 1.7 0 0 0 20 10.97H20a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg></span><span>Настройки</span></button>
+      <button id="tab-inventory" class="btn2 tab sub-tab" onclick="view('inventory')"><span class="nav-ico clip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="16" rx="2"/><path d="M9 4.5h6a1.5 1.5 0 0 0-3-1 1.5 1.5 0 0 0-3 1Z"/><path d="M9 10h6M9 14h6"/></svg></span><span>Инвентаризация</span></button>
+      <button id="tab-reports" class="btn2 tab sub-tab" onclick="view('reports')"><span class="nav-ico chart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19h14"/><path d="M7 15V9"/><path d="M12 15V6"/><path d="M17 15v-3"/></svg></span><span>Отчёты</span></button>
+      <button id="tab-activity" class="btn2 tab sub-tab" onclick="view('activity')"><span class="nav-ico clock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4.7l3 1.8"/></svg></span><span>Действия</span></button>
+      <button id="tab-importexport" class="btn2 tab sub-tab" onclick="view('importexport')"><span class="nav-ico save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4"/><path d="M9 20v-5h6v5"/></svg></span><span>Резерв</span></button>
+      <button id="tab-settings" class="btn2 tab sub-tab" onclick="view('settings')"><span class="nav-ico settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .33 1.88l.07.07a2 2 0 1 1-2.83 2.82l-.07-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.02 1.57V22a2 2 0 0 1-4 0v-.09a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.87.34l-.07.06a2 2 0 1 1-2.83-2.82l.07-.07A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.57-1.03H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.65 8.94a1.7 1.7 0 0 0-.34-1.88l-.07-.07a2 2 0 1 1 2.83-2.82l.07.06a1.7 1.7 0 0 0 1.88.34h.01a1.7 1.7 0 0 0 1.02-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.02 1.56 1.7 1.7 0 0 0 1.88-.34l.07-.06a2 2 0 1 1 2.83 2.82l-.07.07a1.7 1.7 0 0 0-.33 1.88v.01A1.7 1.7 0 0 0 21 9.97H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg></span><span>Настройки</span></button>
     </div>
   </div>
   </div>
