@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Договор рассрочки — ТехноМир v36</title>
+  <title>Договор рассрочки — ТехноМир v37</title>
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f5; color: #111; }
@@ -1711,8 +1711,8 @@ function generateClientId() {
 function generateContractNumber() {
   const year = new Date().getFullYear().toString().slice(-2);
   const existing = installments
-    .map(x => String(x.contractNumber || ""))
-    .filter(n => n.startsWith(year))
+    .map(x => String(x.contractNumber || x.id || ""))
+    .filter(n => n.startsWith(year) && n.length === 6)
     .map(n => Number(n.slice(2)))
     .filter(n => Number.isFinite(n));
   const next = (existing.length ? Math.max(...existing) : 0) + 1;
@@ -1872,7 +1872,8 @@ function fillNewInstallmentForClient(id) {
 
 function addInstallment(){
   const fields = ["clientId","fullName","phone","address","passportNumber","passportIssued","passportDate","product","model","totalPrice","downPayment","months","firstPaymentDate"];
-  const item = { id: Date.now(), contractNumber: generateContractNumber(), payments: [], createdAt: today(), updated_at: nowIso() };
+  const shortContractNumber = generateContractNumber();
+  const item = { id: Number(shortContractNumber), contractNumber: shortContractNumber, payments: [], createdAt: today(), updated_at: nowIso() };
   for (const f of fields) {
     const el = document.getElementById(f);
     item[f] = el ? el.value.trim() : "";
