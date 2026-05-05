@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Договор рассрочки — ТехноМир v35</title>
+  <title>Договор рассрочки — ТехноМир v36</title>
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f5; color: #111; }
@@ -1291,8 +1291,8 @@ function updateFilterButtons() {
 function filteredInstallments(q) {
   const normalizedQuery = String(q || "").toLowerCase().replace(/\D/g, "");
   let list = installments.filter(x => {
-    const text = [x.id, x.fullName, x.phone, x.product, x.model].join(" ").toLowerCase();
-    const digits = [x.id, x.phone].join(" ").replace(/\D/g, "");
+    const text = [contractNo(x), x.id, x.fullName, x.phone, x.product, x.model].join(" ").toLowerCase();
+    const digits = [contractNo(x), x.id, x.phone].join(" ").replace(/\D/g, "");
     return text.includes(q) || (normalizedQuery && digits.includes(normalizedQuery));
   });
 
@@ -1708,6 +1708,22 @@ function generateClientId() {
   return "client_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
 }
 
+function generateContractNumber() {
+  const year = new Date().getFullYear().toString().slice(-2);
+  const existing = installments
+    .map(x => String(x.contractNumber || ""))
+    .filter(n => n.startsWith(year))
+    .map(n => Number(n.slice(2)))
+    .filter(n => Number.isFinite(n));
+  const next = (existing.length ? Math.max(...existing) : 0) + 1;
+  return year + String(next).padStart(4, "0");
+}
+
+function contractNo(item) {
+  if (!item) return "";
+  return String(item.contractNumber || item.id || "");
+}
+
 function isSameClient(a, b) {
   if (!a || !b) return false;
 
@@ -1856,7 +1872,7 @@ function fillNewInstallmentForClient(id) {
 
 function addInstallment(){
   const fields = ["clientId","fullName","phone","address","passportNumber","passportIssued","passportDate","product","model","totalPrice","downPayment","months","firstPaymentDate"];
-  const item = { id: Date.now(), payments: [], createdAt: today(), updated_at: nowIso() };
+  const item = { id: Date.now(), contractNumber: generateContractNumber(), payments: [], createdAt: today(), updated_at: nowIso() };
   for (const f of fields) {
     const el = document.getElementById(f);
     item[f] = el ? el.value.trim() : "";
@@ -2027,7 +2043,7 @@ function render(){
         : "";
     const trust = clientTrust(item);
     return `<tr class="${selected}" style="${rowTint}" onclick="selectItem(${item.id})">
-      <td><b>${item.fullName}</b><br><span class="muted">№ договора: ${item.id}</span><br><span class="muted">${formatPhoneNumber(item.phone || "")}</span><br><span class="mini-badge ${trust.cls}">${trust.label}</span></td>
+      <td><b>${item.fullName}</b><br><span class="muted">№ договора: ${contractNo(item)}</span><br><span class="muted">${formatPhoneNumber(item.phone || "")}</span><br><span class="mini-badge ${trust.cls}">${trust.label}</span></td>
       <td>${item.product}<br><span class="muted">Модель: ${item.model || "—"}</span></td>
       <td><b>${rub(Number(item.totalPrice)-totalPaid(item))}</b></td>
       <td><span class="status ${cls}">${s}</span></td>
@@ -2126,7 +2142,7 @@ function render(){
 
     <div class="contract-body">
       <h1>ДОГОВОР РАССРОЧКИ</h1>
-      <p><b>№ договора:</b> ${item.id}</p>
+      <p><b>№ договора:</b> ${contractNo(item)}</p>
       <p><b>Магазин:</b> ТехноМир</p>
       <p><b>Контакт для связи и оплаты:</b> ${SELLER_PHONE}</p>
       <p><b>Дата оформления:</b> ${formatDate(item.createdAt || today())}</p>
