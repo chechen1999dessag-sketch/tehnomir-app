@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Договор рассрочки — ТехноМир</title>
+  <title>Договор рассрочки — ТехноМир v35</title>
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f5; color: #111; }
@@ -1036,7 +1036,7 @@
 
   <div class="layout">
     <div class="card no-print">
-      <input id="search" placeholder="Поиск по клиенту, телефону, товару, модели" oninput="render()" />
+      <input id="search" placeholder="Поиск по клиенту, телефону, № договора, товару, модели" oninput="render()" />
       <div class="filter-row">
         <button class="chip active" id="filter-all" onclick="setListFilter('all')">Все</button>
         <button class="chip" id="filter-active" onclick="setListFilter('active')">Активные</button>
@@ -1289,9 +1289,12 @@ function updateFilterButtons() {
 }
 
 function filteredInstallments(q) {
-  let list = installments.filter(x =>
-    [x.fullName, x.phone, x.product, x.model].join(" ").toLowerCase().includes(q)
-  );
+  const normalizedQuery = String(q || "").toLowerCase().replace(/\D/g, "");
+  let list = installments.filter(x => {
+    const text = [x.id, x.fullName, x.phone, x.product, x.model].join(" ").toLowerCase();
+    const digits = [x.id, x.phone].join(" ").replace(/\D/g, "");
+    return text.includes(q) || (normalizedQuery && digits.includes(normalizedQuery));
+  });
 
   if (listFilter === "active") {
     list = list.filter(x => status(x) === "Активная");
@@ -2024,7 +2027,7 @@ function render(){
         : "";
     const trust = clientTrust(item);
     return `<tr class="${selected}" style="${rowTint}" onclick="selectItem(${item.id})">
-      <td><b>${item.fullName}</b><br><span class="muted">${formatPhoneNumber(item.phone || "")}</span><br><span class="mini-badge ${trust.cls}">${trust.label}</span></td>
+      <td><b>${item.fullName}</b><br><span class="muted">№ договора: ${item.id}</span><br><span class="muted">${formatPhoneNumber(item.phone || "")}</span><br><span class="mini-badge ${trust.cls}">${trust.label}</span></td>
       <td>${item.product}<br><span class="muted">Модель: ${item.model || "—"}</span></td>
       <td><b>${rub(Number(item.totalPrice)-totalPaid(item))}</b></td>
       <td><span class="status ${cls}">${s}</span></td>
